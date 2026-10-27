@@ -1,0 +1,1533 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Ruta C+CAP · Aula de estudio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #182235;
+      --muted: #657188;
+      --line: #e1e7f0;
+      --brand: #285fe8;
+      --brand-soft: #eaf0ff;
+      --teal: #087f75;
+      --good: #168044;
+      --warning-bg: #fff4d6;
+      --shadow: 0 10px 28px rgba(25, 42, 75, .06);
+      --radius: 16px;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --surface: #121c2d;
+      --surface-soft: #172338;
+      --text: #e8eef8;
+      --muted: #9aa8bf;
+      --line: #2a3850;
+      --brand: #83a5ff;
+      --brand-soft: #1b2a49;
+      --teal: #51d0c1;
+      --good: #4ade80;
+      --warning-bg: #3b2e13;
+      --shadow: 0 10px 28px rgba(0, 0, 0, .18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--brand);
+      outline-offset: 2px;
+    }
+    a { color: var(--brand); }
+    .shell { width: min(1220px, 100% - 32px); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 91%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border-radius: 13px;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, #285fe8, #087f75);
+    }
+    .brand-title { font-size: 16px; font-weight: 850; line-height: 1.2; }
+    .brand-subtitle { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .storage-status {
+      color: var(--muted);
+      font-size: 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 9px;
+      white-space: nowrap;
+    }
+
+    .button, .icon-button, .nav-button {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--text);
+      background: var(--surface);
+      padding: 10px 13px;
+      font-weight: 750;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .button:hover, .icon-button:hover, .nav-button:hover { border-color: var(--brand); }
+    .button:active, .icon-button:active { transform: scale(.98); }
+    .button.primary { color: #fff; background: var(--brand); border-color: var(--brand); }
+    .button.teal { color: #fff; background: var(--teal); border-color: var(--teal); }
+    .button.danger { color: #b42318; }
+    :root[data-theme="dark"] .button.danger { color: #fda29b; }
+    .icon-button { width: 41px; height: 41px; padding: 0; font-size: 17px; }
+
+    .nav {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 17px 0 6px;
+      scrollbar-width: thin;
+    }
+    .nav-button { flex: 0 0 auto; white-space: nowrap; }
+    .nav-button[aria-current="page"] {
+      color: var(--brand);
+      background: var(--brand-soft);
+      border-color: var(--brand);
+    }
+
+    .hero { padding: 26px 0 12px; }
+    .eyebrow {
+      color: var(--brand);
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+    }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    .hero h1 {
+      margin: 7px 0 9px;
+      font-size: clamp(27px, 4vw, 39px);
+      line-height: 1.12;
+      letter-spacing: -1.2px;
+    }
+    .hero p { max-width: 780px; color: var(--muted); margin-bottom: 0; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 26px;
+    }
+    .stat, .card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .stat { padding: 15px; }
+    .stat-label { color: var(--muted); font-size: 12px; font-weight: 750; }
+    .stat-value { display: block; margin: 3px 0; font-size: 27px; font-weight: 900; letter-spacing: -1px; }
+    .stat-help { color: var(--muted); font-size: 11px; }
+    .card { padding: 19px; }
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 24px 0 13px;
+    }
+    .section-heading h2 { font-size: 21px; margin: 0; letter-spacing: -.4px; }
+    .section-heading p { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .grid-2, .grid-3 { display: grid; gap: 13px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .feature-card { padding: 18px; }
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 19px;
+      margin-bottom: 13px;
+    }
+    .feature-card h3 { font-size: 16px; margin-bottom: 7px; }
+    .feature-card p { color: var(--muted); font-size: 13px; margin-bottom: 0; }
+    .notice {
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: var(--warning-bg);
+      font-size: 12px;
+      margin: 15px 0;
+    }
+    .muted { color: var(--muted); }
+    .placeholder {
+      border: 1px dashed var(--line);
+      background: var(--surface-soft);
+      border-radius: 13px;
+      padding: 22px;
+      text-align: center;
+    }
+    .placeholder-icon { font-size: 29px; margin-bottom: 7px; }
+    .placeholder h3 { margin-bottom: 6px; }
+    .placeholder p { max-width: 560px; margin: 0 auto; color: var(--muted); font-size: 13px; }
+    .field { display: grid; gap: 6px; margin: 12px 0; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .field input, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-soft);
+      color: var(--text);
+      padding: 11px 12px;
+    }
+    .field textarea { min-height: 105px; resize: vertical; }
+    .row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .progress-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+    .progress-track span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--teal)); border-radius: inherit; }
+    .topic-row { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(80px, 2fr) 45px; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .topic-row:last-child { border-bottom: 0; }
+    .topic-row strong { font-size: 12px; }
+    .topic-row small { display: block; color: var(--muted); font-size: 11px; }
+    .topic-row .percent { text-align: right; font-size: 12px; font-weight: 850; }
+    .footer { text-align: center; color: var(--muted); font-size: 11px; padding: 28px 0 24px; }
+    .hidden { display: none !important; }
+    .status-message { min-height: 20px; color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .source-list { display: grid; gap: 9px; }
+    .source-link {
+      display: flex;
+      gap: 11px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration: none;
+      background: var(--surface);
+    }
+    .source-link:hover { border-color: var(--brand); }
+    .source-link strong { display: block; font-size: 12px; }
+    .source-link small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+
+    @media (max-width: 850px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 24px, 1220px); }
+      .topbar-inner { min-height: 61px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .brand-title { font-size: 14px; }
+      .brand-subtitle { font-size: 10px; }
+      .storage-status, .desktop-only { display: none; }
+      .nav { padding-top: 12px; }
+      .nav-button { padding: 9px 10px; font-size: 12px; }
+      .hero { padding-top: 20px; }
+      .stats { gap: 8px; }
+      .stat { padding: 11px; }
+      .stat-value { font-size: 24px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .card { padding: 15px; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .topic-row { grid-template-columns: 1fr 1fr 38px; gap: 7px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">C+</div>
+        <div>
+          <div class="brand-title">Ruta C+CAP</div>
+          <div class="brand-subtitle">Aula personal · permiso C y CAP mercancías</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="storage-status" id="storageStatus">● Guardado local</span>
+        <button class="icon-button" id="themeButton" type="button" aria-label="Cambiar tema" title="Cambiar tema">☾</button>
+        <button class="button desktop-only" id="exportButton" type="button">↧ Copia de seguridad</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="nav" aria-label="Secciones principales">
+      <button class="nav-button" type="button" data-tab="lectiva" aria-current="page">📚 Parte lectiva</button>
+      <button class="nav-button" type="button" data-tab="interactiva">⚡ Parte interactiva</button>
+      <button class="nav-button" type="button" data-tab="preparatoria">🎯 Preparatoria</button>
+      <button class="nav-button" type="button" data-tab="progreso">📈 Mi progreso</button>
+    </nav>
+
+    <section class="hero">
+      <div class="eyebrow">Tu ruta de aprendizaje</div>
+      <h1>Aprende. Practica. Llega preparado.</h1>
+      <p>Una base de estudio organizada en tres partes: teoría, práctica interactiva y simulacros preparatorios. El progreso y tus preferencias se guardan en este navegador.</p>
+    </section>
+
+    <section class="stats" aria-label="Resumen del progreso">
+      <article class="stat">
+        <span class="stat-label">Respuestas realizadas</span>
+        <strong class="stat-value" id="statAnswered">0</strong>
+        <span class="stat-help">Práctica y simulacros</span>
+      </article>
+      <article class="stat">
+        <span class="stat-label">Acierto global</span>
+        <strong class="stat-value" id="statAccuracy">0%</strong>
+        <span class="stat-help">Sobre respuestas corregidas</span>
+      </article>
+      <article class="stat">
+        <span class="stat-label">Pendientes de refuerzo</span>
+        <strong class="stat-value" id="statPending">0</strong>
+        <span class="stat-help">Se conectará a la lógica de preguntas</span>
+      </article>
+      <article class="stat">
+        <span class="stat-label">Simulacros terminados</span>
+        <strong class="stat-value" id="statExams">0</strong>
+        <span class="stat-help">Historial local</span>
+      </article>
+    </section>
+
+    <main id="appMain">
+      <!-- PARTE LECTIVA -->
+      <section class="app-view" id="view-lectiva">
+        <div class="section-heading">
+          <div>
+            <h2>Parte lectiva · Temario</h2>
+            <p>Bloques de teoría para estudiar antes de pasar a los test.</p>
+          </div>
+          <span class="tag">Estructura preparada</span>
+        </div>
+
+        <div class="grid-3">
+          <article class="card feature-card">
+            <div class="feature-icon">📘</div>
+            <h3>Permiso C y circulación</h3>
+            <p>Vehículo pesado, maniobras, seguridad vial, neumáticos, frenado e inspección previa.</p>
+          </article>
+          <article class="card feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3>Transporte de mercancías</h3>
+            <p>Masas, carga, estiba, documentación, operaciones y responsabilidades del conductor.</p>
+          </article>
+          <article class="card feature-card">
+            <div class="feature-icon">⏱️</div>
+            <h3>CAP y normativa</h3>
+            <p>Tiempos de conducción, pausas, descansos, tacógrafo, prevención y cualificación profesional.</p>
+          </article>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Notas personales</h2>
+            <p>Escribe recordatorios o conceptos que quieras repasar. Se guardan automáticamente.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="field">
+            <label for="personalNotes">Mis apuntes</label>
+            <textarea id="personalNotes" placeholder="Escribe aquí tus notas de estudio..."></textarea>
+          </div>
+          <div class="row-actions">
+            <button class="button primary" id="saveNotesButton" type="button">Guardar apuntes</button>
+            <span class="status-message" id="notesStatus" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="notice"><strong>Importante:</strong> el temario definitivo y las respuestas se añadirán en la segunda parte. Comprueba siempre la normativa vigente y las condiciones de tu convocatoria.</div>
+      </section>
+
+      <!-- PARTE INTERACTIVA -->
+      <section class="app-view hidden" id="view-interactiva">
+        <div class="section-heading">
+          <div>
+            <h2>Parte interactiva · Práctica</h2>
+            <p>Aquí se conectarán el banco de preguntas, la corrección y el refuerzo de errores.</p>
+          </div>
+          <span class="tag">Módulo preparado</span>
+        </div>
+        <div class="grid-2">
+          <article class="card feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Test por bloques</h3>
+            <p>Elegirás el tema y el número de preguntas. La interfaz mostrará opciones, respuesta correcta y explicación cuando se conecte la lógica.</p>
+          </article>
+          <article class="card feature-card">
+            <div class="feature-icon">🔁</div>
+            <h3>Refuerzo de fallos</h3>
+            <p>Las preguntas falladas podrán volver a aparecer hasta que las respondas correctamente.</p>
+          </article>
+        </div>
+        <div class="placeholder" style="margin-top:13px">
+          <div class="placeholder-icon">🧩</div>
+          <h3>Zona de preguntas</h3>
+          <p>Este espacio queda reservado para el test interactivo. En la parte 2 se incorporarán los datos de las preguntas y la lógica para responder, corregir y guardar resultados.</p>
+        </div>
+      </section>
+
+      <!-- PARTE PREPARATORIA -->
+      <section class="app-view hidden" id="view-preparatoria">
+        <div class="section-heading">
+          <div>
+            <h2>Preparatoria · Simulacros</h2>
+            <p>La zona de examen tendrá temporizador, hoja de respuestas y revisión al finalizar.</p>
+          </div>
+          <span class="tag">Modo examen</span>
+        </div>
+        <div class="grid-2">
+          <article class="card feature-card">
+            <div class="feature-icon">🚛</div>
+            <h3>Simulacro de permiso C</h3>
+            <p>Configuración visual lista para conectar preguntas, tiempo límite, respuestas y resultado.</p>
+            <p><button class="button" type="button" disabled>Se activará en la parte 2</button></p>
+          </article>
+          <article class="card feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>Simulacro CAP mercancías</h3>
+            <p>Configuración visual lista para conectar el banco CAP, la puntuación y la revisión de errores.</p>
+            <p><button class="button" type="button" disabled>Se activará en la parte 2</button></p>
+          </article>
+        </div>
+        <div class="notice"><strong>Nota:</strong> los simulacros de esta aplicación serán material de práctica y no sustituirán a los cuestionarios oficiales.</div>
+      </section>
+
+      <!-- PROGRESO -->
+      <section class="app-view hidden" id="view-progreso">
+        <div class="section-heading">
+          <div>
+            <h2>Mi progreso</h2>
+            <p>Estadísticas, notas e historial almacenados en el dispositivo.</p>
+          </div>
+          <span class="tag" id="lastSavedLabel">Sin cambios recientes</span>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <h3>Precisión acumulada</h3>
+            <div class="stat-value" id="progressAccuracy">0%</div>
+            <div class="progress-track" aria-label="Precisión acumulada"><span id="accuracyBar"></span></div>
+            <p class="muted" id="accuracyDescription" style="font-size:12px;margin:9px 0 0">Aún no hay respuestas registradas.</p>
+          </article>
+          <article class="card">
+            <h3>Almacenamiento local</h3>
+            <p class="muted" style="font-size:13px">Los datos permanecen en este navegador. Exporta una copia si vas a cambiar de dispositivo o borrar los datos del navegador.</p>
+            <div class="row-actions">
+              <button class="button primary" id="exportButtonProgress" type="button">Exportar copia JSON</button>
+              <button class="button" id="importButton" type="button">Importar copia</button>
+              <button class="button danger" id="resetButton" type="button">Borrar progreso</button>
+            </div>
+            <input class="hidden" type="file" id="importFile" accept=".json,application/json">
+            <div class="status-message" id="backupStatus" aria-live="polite"></div>
+          </article>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Progreso por bloques</h2>
+            <p>La información se actualizará al incorporar la lógica de preguntas.</p>
+          </div>
+        </div>
+        <div class="card" id="topicProgress">
+          <div class="topic-row"><div><strong>Permiso C</strong><small>Sin datos todavía</small></div><div class="progress-track"><span style="width:0%"></span></div><div class="percent">0%</div></div>
+          <div class="topic-row"><div><strong>CAP mercancías</strong><small>Sin datos todavía</small></div><div class="progress-track"><span style="width:0%"></span></div><div class="percent">0%</div></div>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Historial de simulacros</h2>
+            <p>Los resultados completados se mostrarán aquí en la segunda parte.</p>
+          </div>
+        </div>
+        <div class="card" id="examHistory">
+          <p class="muted" style="margin:0;font-size:13px">Todavía no hay simulacros guardados.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Ruta C+CAP · Interfaz base · Datos guardados localmente en tu navegador.</footer>
+  </div>
+
+  <script>
+    "use strict";
+
+    /*
+      PARTE 1: estructura de interfaz y almacenamiento local.
+      Aquí NO se incluye todavía el banco ni la lógica de preguntas.
+      En la parte 2 se conectarán las funciones de test y simulacro a este estado.
+    */
+
+    const STORAGE_KEY = "ruta_ccap_app_v1";
+    const THEME_KEY = "ruta_ccap_theme_v1";
+
+    const DEFAULT_STATE = {
+      version: 1,
+      preferences: {
+        theme: "light",
+        activeTab: "lectiva"
+      },
+      profile: {
+        personalNotes: ""
+      },
+      progress: {
+        totalAnswered: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        pendingQuestionIds: [],
+        masteredQuestionIds: [],
+        mistakesByQuestion: {},
+        topicStats: {},
+        examHistory: [],
+        completedExams: 0
+      },
+      meta: {
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    };
+
+    let appState = loadState();
+
+    function deepCopy(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function mergeState(defaults, saved) {
+      return {
+        ...defaults,
+        ...saved,
+        preferences: {
+          ...defaults.preferences,
+          ...(saved.preferences || {})
+        },
+        profile: {
+          ...defaults.profile,
+          ...(saved.profile || {})
+        },
+        progress: {
+          ...defaults.progress,
+          ...(saved.progress || {})
+        },
+        meta: {
+          ...defaults.meta,
+          ...(saved.meta || {})
+        }
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return deepCopy(DEFAULT_STATE);
+
+        const saved = JSON.parse(raw);
+        if (!saved || typeof saved !== "object") {
+          return deepCopy(DEFAULT_STATE);
+        }
+
+        return mergeState(deepCopy(DEFAULT_STATE), saved);
+      } catch (error) {
+        console.warn("No se pudo leer el almacenamiento local:", error);
+        showStorageStatus("No se pudo leer el guardado local");
+        return deepCopy(DEFAULT_STATE);
+      }
+    }
+
+    function saveState() {
+      try {
+        appState.meta.updatedAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        localStorage.setItem(THEME_KEY, appState.preferences.theme);
+        showStorageStatus("● Guardado local");
+        updateLastSavedLabel();
+        return true;
+      } catch (error) {
+        console.error("No se pudo guardar el estado:", error);
+        showStorageStatus("Error al guardar");
+        return false;
+      }
+    }
+
+    function showStorageStatus(message) {
+      const element = document.getElementById("storageStatus");
+      if (element) element.textContent = message;
+    }
+
+    function updateLastSavedLabel() {
+      const element = document.getElementById("lastSavedLabel");
+      if (!element) return;
+
+      const updatedAt = appState.meta.updatedAt;
+      if (!updatedAt) {
+        element.textContent = "Sin cambios recientes";
+        return;
+      }
+
+      const date = new Date(updatedAt);
+      element.textContent = "Guardado: " + date.toLocaleString("es-ES", {
+        dateStyle: "short",
+        timeStyle: "short"
+      });
+    }
+
+    function applyTheme(theme) {
+      const normalized = theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = normalized;
+      appState.preferences.theme = normalized;
+
+      const button = document.getElementById("themeButton");
+      if (button) {
+        button.textContent = normalized === "dark" ? "☀" : "☾";
+        button.setAttribute(
+          "aria-label",
+          normalized === "dark" ? "Activar tema claro" : "Activar tema oscuro"
+        );
+      }
+    }
+
+    function toggleTheme() {
+      const nextTheme = appState.preferences.theme === "dark" ? "light" : "dark";
+      applyTheme(nextTheme);
+      saveState();
+    }
+
+    function showTab(tabName, shouldSave = true) {
+      const validTabs = ["lectiva", "interactiva", "preparatoria", "progreso"];
+      const target = validTabs.includes(tabName) ? tabName : "lectiva";
+
+      document.querySelectorAll(".app-view").forEach(section => {
+        section.classList.toggle("hidden", section.id !== "view-" + target);
+      });
+
+      document.querySelectorAll(".nav-button").forEach(button => {
+        if (button.dataset.tab === target) {
+          button.setAttribute("aria-current", "page");
+        } else {
+          button.removeAttribute("aria-current");
+        }
+      });
+
+      appState.preferences.activeTab = target;
+      if (shouldSave) saveState();
+    }
+
+    function updateDashboard() {
+      const p = appState.progress;
+      const answered = Number(p.totalAnswered) || 0;
+      const correct = Number(p.totalCorrect) || 0;
+      const wrong = Number(p.totalWrong) || 0;
+      const pending = Array.isArray(p.pendingQuestionIds) ? p.pendingQuestionIds.length : 0;
+      const exams = Number(p.completedExams) || (Array.isArray(p.examHistory) ? p.examHistory.length : 0);
+      const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+
+      setText("statAnswered", answered);
+      setText("statAccuracy", accuracy + "%");
+      setText("statPending", pending);
+      setText("statExams", exams);
+      setText("progressAccuracy", accuracy + "%");
+      setText("accuracyDescription", answered
+        ? `${correct} aciertos y ${wrong} errores registrados.`
+        : "Aún no hay respuestas registradas.");
+
+      const bar = document.getElementById("accuracyBar");
+      if (bar) bar.style.width = accuracy + "%";
+
+      renderTopicProgress();
+      renderExamHistory();
+      updateLastSavedLabel();
+    }
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = String(value);
+    }
+
+    function renderTopicProgress() {
+      const container = document.getElementById("topicProgress");
+      if (!container) return;
+
+      const topics = [
+        { id: "permiso_c", title: "Permiso C" },
+        { id: "cap_mercancias", title: "CAP mercancías" }
+      ];
+
+      container.innerHTML = topics.map(topic => {
+        const item = appState.progress.topicStats[topic.id] || { answered: 0, correct: 0 };
+        const answered = Number(item.answered) || 0;
+        const correct = Number(item.correct) || 0;
+        const accuracy = answered ? Math.round(correct / answered * 100) : 0;
+        const description = answered
+          ? `${answered} respuestas registradas`
+          : "Sin datos todavía";
+
+        return `
+          <div class="topic-row">
+            <div>
+              <strong>${escapeHTML(topic.title)}</strong>
+              <small>${escapeHTML(description)}</small>
+            </div>
+            <div class="progress-track" aria-label="Acierto ${accuracy}%">
+              <span style="width:${accuracy}%"></span>
+            </div>
+            <div class="percent">${accuracy}%</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderExamHistory() {
+      const container = document.getElementById("examHistory");
+      if (!container) return;
+
+      const history = Array.isArray(appState.progress.examHistory)
+        ? appState.progress.examHistory
+        : [];
+
+      if (!history.length) {
+        container.innerHTML = '<p class="muted" style="margin:0;font-size:13px">Todavía no hay simulacros guardados.</p>';
+        return;
+      }
+
+      container.innerHTML = history.slice(0, 20).map(item => {
+        const date = item.date ? new Date(item.date).toLocaleString("es-ES") : "Fecha no disponible";
+        const mode = item.mode === "CAP" ? "CAP mercancías" : "Permiso C";
+        const score = item.score ?? item.points ?? "—";
+
+        return `
+          <div class="topic-row">
+            <div>
+              <strong>${escapeHTML(mode)}</strong>
+              <small>${escapeHTML(date)}</small>
+            </div>
+            <div class="muted">Resultado registrado</div>
+            <div class="percent">${escapeHTML(score)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function saveNotes() {
+      const field = document.getElementById("personalNotes");
+      const status = document.getElementById("notesStatus");
+      appState.profile.personalNotes = field ? field.value : "";
+
+      const saved = saveState();
+      if (status) {
+        status.textContent = saved ? "Apuntes guardados en este dispositivo." : "No se pudieron guardar los apuntes.";
+      }
+    }
+
+    function exportBackup() {
+      const backup = {
+        app: "Ruta C+CAP",
+        formatVersion: 1,
+        exportedAt: new Date().toISOString(),
+        state: appState
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: "application/json;charset=utf-8"
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "ruta_ccap_copia_seguridad.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      const status = document.getElementById("backupStatus");
+      if (status) status.textContent = "Copia de seguridad exportada.";
+    }
+
+    function importBackupFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result || ""));
+          const importedState = parsed.state || parsed;
+
+          if (!importedState || typeof importedState !== "object" || !importedState.progress) {
+            throw new Error("El archivo no contiene un respaldo válido de Ruta C+CAP.");
+          }
+
+          const confirmed = window.confirm(
+            "La importación reemplazará el progreso y las preferencias actuales. ¿Quieres continuar?"
+          );
+          if (!confirmed) return;
+
+          appState = mergeState(deepCopy(DEFAULT_STATE), importedState);
+          applyTheme(appState.preferences.theme);
+          document.getElementById("personalNotes").value = appState.profile.personalNotes || "";
+          saveState();
+          updateDashboard();
+          showTab(appState.preferences.activeTab, false);
+
+          const status = document.getElementById("backupStatus");
+          if (status) status.textContent = "Copia importada correctamente.";
+        } catch (error) {
+          window.alert("No se pudo importar la copia: " + error.message);
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetProgress() {
+      const confirmed = window.confirm(
+        "¿Borrar las estadísticas, los apuntes y el historial guardados en este navegador? Esta acción no se puede deshacer."
+      );
+      if (!confirmed) return;
+
+      const currentTheme = appState.preferences.theme;
+      appState = deepCopy(DEFAULT_STATE);
+      appState.preferences.theme = currentTheme;
+      document.getElementById("personalNotes").value = "";
+      saveState();
+      updateDashboard();
+      showTab("lectiva");
+
+      const status = document.getElementById("backupStatus");
+      if (status) status.textContent = "Se ha reiniciado el progreso local.";
+    }
+
+    function initializeApp() {
+      applyTheme(appState.preferences.theme);
+      document.getElementById("personalNotes").value = appState.profile.personalNotes || "";
+
+      document.querySelectorAll(".nav-button").forEach(button => {
+        button.addEventListener("click", () => showTab(button.dataset.tab));
+      });
+
+      document.getElementById("themeButton").addEventListener("click", toggleTheme);
+      document.getElementById("exportButton").addEventListener("click", exportBackup);
+      document.getElementById("exportButtonProgress").addEventListener("click", exportBackup);
+      document.getElementById("importButton").addEventListener("click", () => {
+        document.getElementById("importFile").click();
+      });
+      document.getElementById("importFile").addEventListener("change", importBackupFile);
+      document.getElementById("resetButton").addEventListener("click", resetProgress);
+      document.getElementById("saveNotesButton").addEventListener("click", saveNotes);
+
+      // Guardado automático de los apuntes al salir del campo.
+      document.getElementById("personalNotes").addEventListener("change", saveNotes);
+
+      updateDashboard();
+      showTab(appState.preferences.activeTab, false);
+      showStorageStatus("● Guardado local");
+    }
+
+    initializeApp();
+  </script>
+
+<script>
+/* PARTE 2 — Banco de preguntas y lógica de Ruta C+CAP
+   Pega este bloque al final del documento HTML, antes de la etiqueta de cierre del cuerpo.
+   Banco didáctico original: no reproduce literalmente los cuestionarios oficiales.
+*/
+const CCAP_BANK = [{"id":"cap001","area":"CAP","topic":"Tiempos y tacógrafo","text":"Tras un período de conducción de 4 horas y media, ¿qué pausa general exige la normativa europea, salvo excepciones aplicables?","options":["45 minutos ininterrumpidos","30 minutos","15 minutos","60 minutos"],"correct":0,"explanation":"La regla general exige una pausa ininterrumpida de al menos 45 minutos tras 4,5 horas de conducción.","wrong":"Las pausas de 15 y 30 minutos solo sirven para el fraccionamiento permitido si se toman en ese orden.","specific":false},{"id":"cap002","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cómo puede fraccionarse la pausa general de 45 minutos?","options":["30 minutos y después 15","15 minutos y después 30","Tres pausas de 15 minutos en cualquier orden","Dos pausas de 20 minutos"],"correct":1,"explanation":"El fraccionamiento general permitido es una pausa de al menos 15 minutos seguida de otra de al menos 30, dentro del período correspondiente.","wrong":"No basta con sumar 45 minutos de cualquier forma: el fraccionamiento general exige primero 15 y después 30 minutos.","specific":false},{"id":"cap003","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es el tiempo máximo general de conducción diaria?","options":["8 horas, sin excepciones","9 horas, ampliable a 10 como máximo dos veces por semana","10 horas todos los días","12 horas si el vehículo tiene tacógrafo"],"correct":1,"explanation":"El límite general es de 9 horas al día; puede ampliarse a 10 horas como máximo dos veces por semana.","wrong":"La ampliación a 10 horas es limitada: no puede usarse todos los días.","specific":false},{"id":"cap004","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es el máximo general de conducción en una semana?","options":["45 horas","50 horas","56 horas","60 horas"],"correct":2,"explanation":"El tiempo de conducción semanal no debe superar 56 horas, sin perjuicio de otros límites de trabajo aplicables.","wrong":"El límite semanal de conducción es 56 horas; además se controla el acumulado de dos semanas.","specific":false},{"id":"cap005","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es el máximo de conducción acumulada en dos semanas consecutivas?","options":["80 horas","90 horas","96 horas","112 horas"],"correct":1,"explanation":"La conducción acumulada en dos semanas consecutivas no puede superar 90 horas.","wrong":"No se deben sumar dos máximos semanales de 56 horas como si no existiera límite bisemanal.","specific":false},{"id":"cap006","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es el descanso diario regular general?","options":["Al menos 8 horas","Al menos 9 horas","Al menos 10 horas","Al menos 11 horas"],"correct":3,"explanation":"El descanso diario regular es de al menos 11 horas; existen modalidades reducidas y fraccionadas bajo condiciones concretas.","wrong":"Nueve horas corresponden a un descanso diario reducido, sujeto a límites y condiciones.","specific":false},{"id":"cap007","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es la duración mínima habitual de un descanso diario reducido?","options":["7 horas","8 horas","9 horas","10 horas"],"correct":2,"explanation":"El descanso diario reducido puede ser de al menos 9 horas, pero menos de 11, dentro de los límites reglamentarios.","wrong":"No puede reducirse libremente por debajo de 9 horas.","specific":false},{"id":"cap008","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Cuál es la duración mínima de un descanso semanal regular?","options":["24 horas","36 horas","45 horas","48 horas"],"correct":2,"explanation":"El descanso semanal regular es de al menos 45 horas.","wrong":"Las 24 horas corresponden al mínimo posible de un descanso semanal reducido, con condiciones y compensación.","specific":false},{"id":"cap009","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Qué afirmación sobre el descanso semanal reducido es correcta?","options":["Siempre es de 12 horas","Puede reducirse hasta 24 horas, sujeto a condiciones y compensación","No requiere compensación nunca","Puede sustituirse por una pausa de 45 minutos"],"correct":1,"explanation":"El descanso semanal reducido puede llegar a 24 horas, pero la reducción debe compensarse conforme a la normativa aplicable.","wrong":"Reducir el descanso semanal no elimina las obligaciones de compensación y planificación.","specific":false},{"id":"cap010","area":"CAP","topic":"Tiempos y tacógrafo","text":"Si una actividad no queda registrada automáticamente por el tacógrafo, ¿qué debe hacer el conductor?","options":["Ignorarla si no fue conducción","Registrar manualmente la actividad correspondiente cuando proceda","Borrar el registro anterior","Anotar solo los kilómetros"],"correct":1,"explanation":"Las actividades pertinentes que no se registran automáticamente deben introducirse manualmente de acuerdo con las reglas del tacógrafo.","wrong":"El registro debe reflejar las actividades reales; no se limita a los kilómetros recorridos.","specific":false},{"id":"cap011","area":"CAP","topic":"Seguridad vial","text":"¿Qué elementos forman la distancia de detención?","options":["Solo la distancia de frenado","Distancia de reacción y distancia de frenado","Solo el tiempo de reacción","Distancia de seguridad y longitud del vehículo"],"correct":1,"explanation":"La distancia de detención suma lo recorrido durante la reacción y lo recorrido durante el frenado.","wrong":"La distancia de frenado es solo una parte de la distancia total de detención.","specific":false},{"id":"cap012","area":"CAP","topic":"Seguridad vial","text":"¿Qué debe hacer un conductor que nota somnolencia intensa?","options":["Abrir la ventanilla y continuar","Subir la música","Detenerse en un lugar seguro y descansar","Aumentar la velocidad para llegar antes"],"correct":2,"explanation":"La somnolencia deteriora la atención y los reflejos; la medida segura es parar en un lugar adecuado y descansar.","wrong":"Trucos como música o aire fresco no sustituyen el descanso y pueden dar una falsa sensación de alerta.","specific":false},{"id":"cap013","area":"CAP","topic":"Seguridad vial","text":"¿Cuál es la función principal del ABS?","options":["Garantizar siempre una distancia de frenado menor","Ayudar a evitar el bloqueo de las ruedas durante la frenada","Sustituir el freno de estacionamiento","Aumentar la carga admisible"],"correct":1,"explanation":"El ABS ayuda a evitar el bloqueo de las ruedas y a conservar capacidad de dirección durante una frenada intensa.","wrong":"El ABS no elimina los límites de adherencia ni garantiza una distancia menor en toda superficie.","specific":false},{"id":"cap014","area":"CAP","topic":"Seguridad vial","text":"¿Qué es el aquaplaning?","options":["La pérdida de adherencia por una película de agua entre neumático y calzada","El sobrecalentamiento del motor","La pérdida de aire del sistema de frenos","Una avería del tacógrafo"],"correct":0,"explanation":"El aquaplaning aparece cuando el neumático no consigue evacuar suficiente agua y pierde contacto efectivo con la calzada.","wrong":"No es una avería del motor o del tacógrafo, sino una pérdida de contacto y adherencia.","specific":false},{"id":"cap015","area":"CAP","topic":"Seguridad vial","text":"Al descender una pendiente larga con un vehículo pesado, ¿qué estrategia es más segura?","options":["Bajar en punto muerto","Elegir antes una marcha adecuada y usar los sistemas de retención previstos","Mantener pisado el embrague","Frenar continuamente con fuerza hasta el final"],"correct":1,"explanation":"Una marcha adecuada y los sistemas de retención ayudan a controlar la velocidad y evitan sobrecargar los frenos de servicio.","wrong":"El punto muerto o el embrague pisado reducen el control; frenar continuamente puede sobrecalentar los frenos.","specific":false},{"id":"cap016","area":"CAP","topic":"Seguridad vial","text":"Ante viento lateral fuerte, el conductor debe principalmente...","options":["Aumentar la velocidad para estabilizar el vehículo","Realizar giros bruscos","Reducir la velocidad si es necesario y evitar maniobras bruscas","Circular pegado al vehículo precedente"],"correct":2,"explanation":"La reducción de velocidad y las maniobras suaves ayudan a conservar estabilidad frente al viento lateral.","wrong":"Acelerar o realizar movimientos bruscos puede empeorar la estabilidad.","specific":false},{"id":"cap017","area":"CAP","topic":"Seguridad vial","text":"¿Por qué son especialmente importantes los ángulos muertos en un camión?","options":["Porque los espejos eliminan toda visibilidad","Porque puede haber usuarios vulnerables fuera del campo de visión","Porque solo afectan al conducir de noche","Porque impiden usar los intermitentes"],"correct":1,"explanation":"Los ángulos muertos pueden ocultar peatones, ciclistas, motocicletas u otros vehículos, especialmente al girar o maniobrar.","wrong":"Los espejos ayudan, pero no garantizan visión completa del entorno.","specific":false},{"id":"cap018","area":"CAP","topic":"Seguridad vial","text":"En un giro cerrado, ¿qué fenómeno debe anticipar el conductor de un vehículo largo?","options":["Que las ruedas traseras sigan exactamente la trayectoria de las delanteras","Que las ruedas traseras puedan pasar más cerca del interior del giro","Que el vehículo reduzca automáticamente su longitud","Que desaparezcan los ángulos muertos"],"correct":1,"explanation":"La trayectoria de las ruedas traseras es más cerrada que la del eje delantero y puede invadir bordillos u otros espacios.","wrong":"La longitud y la geometría del vehículo hacen que las ruedas traseras no sigan la misma línea que las delanteras.","specific":false},{"id":"cap019","area":"CAP","topic":"Seguridad vial","text":"¿Qué debe hacer si la adherencia disminuye por hielo o lluvia intensa?","options":["Aumentar la velocidad para evitar patinar","Aumentar la distancia de seguridad y suavizar las maniobras","Frenar y girar bruscamente","Confiar exclusivamente en el ABS"],"correct":1,"explanation":"Con poca adherencia hay que reducir la velocidad, aumentar la distancia y evitar aceleraciones, frenadas o giros bruscos.","wrong":"Los sistemas de asistencia no crean adherencia; la conducción debe adaptarse a las condiciones.","specific":false},{"id":"cap020","area":"CAP","topic":"Seguridad vial","text":"¿Cuál es una práctica correcta al aproximarse a una intersección con visibilidad limitada?","options":["Mantener la velocidad para no obstaculizar","Reducir la velocidad y estar preparado para detenerse","Adelantar antes de llegar","Mirar solo el espejo interior"],"correct":1,"explanation":"La aproximación prudente permite comprobar el entorno y detenerse si aparece un peligro.","wrong":"Mantener la velocidad sin visibilidad suficiente reduce el margen para reaccionar.","specific":false},{"id":"cap021","area":"CAP","topic":"Carga y estiba","text":"¿Qué significa la masa máxima autorizada (MMA)?","options":["La masa del vehículo vacío","La masa máxima del vehículo cargado autorizada para circular","El peso de la carga útil únicamente","La masa máxima del remolque en cualquier conjunto"],"correct":1,"explanation":"La MMA es la masa máxima autorizada del vehículo en circulación, incluida su carga y ocupantes según corresponda.","wrong":"La carga útil es solo la capacidad disponible para carga; no equivale a la MMA.","specific":false},{"id":"cap022","area":"CAP","topic":"Carga y estiba","text":"La carga útil se calcula, de forma general, como...","options":["MMA menos la masa en orden de marcha aplicable","MMA más la masa del vehículo","La masa del motor más el combustible","La masa máxima por eje multiplicada por dos"],"correct":0,"explanation":"La carga útil representa la masa disponible para carga y ocupantes dentro de los límites aplicables, a partir de la MMA y la masa real de referencia.","wrong":"No se obtiene sumando masas ni ignorando la masa propia del vehículo.","specific":false},{"id":"cap023","area":"CAP","topic":"Carga y estiba","text":"Además de respetar la MMA, ¿qué límites deben comprobarse?","options":["Solo la altura de la carga","Los límites de masa por eje y demás límites aplicables","Solo el peso de cada bulto","Únicamente la presión de los neumáticos"],"correct":1,"explanation":"La distribución puede sobrecargar un eje aunque la masa total esté dentro de la MMA.","wrong":"Una masa total correcta no garantiza por sí sola que las cargas por eje sean legales.","specific":false},{"id":"cap024","area":"CAP","topic":"Carga y estiba","text":"¿Qué efecto puede producir un centro de gravedad elevado?","options":["Reduce siempre el riesgo de vuelco","Aumenta la estabilidad en curvas","Puede aumentar el riesgo de vuelco y afectar la estabilidad","No afecta al comportamiento del vehículo"],"correct":2,"explanation":"Una carga alta eleva el centro de gravedad y puede aumentar la transferencia de carga y el riesgo de vuelco.","wrong":"El centro de gravedad influye directamente en la estabilidad, especialmente en curvas y maniobras evasivas.","specific":false},{"id":"cap025","area":"CAP","topic":"Carga y estiba","text":"¿Cuál es el objetivo principal de sujetar la carga?","options":["Evitar solo el ruido","Impedir desplazamientos peligrosos al frenar, acelerar o girar","Aumentar la MMA","Evitar tener que revisar la carga"],"correct":1,"explanation":"La sujeción debe resistir las fuerzas previsibles del transporte y evitar desplazamientos o caídas.","wrong":"La sujeción protege la seguridad; no aumenta la masa autorizada ni elimina las comprobaciones.","specific":false},{"id":"cap026","area":"CAP","topic":"Carga y estiba","text":"Antes de iniciar la marcha, el conductor debe comprobar...","options":["Solo que las puertas estén cerradas","Que la carga esté estable, sujeta y que los cierres y amarres sean adecuados","Solo la documentación del vehículo","Únicamente que el motor arranque"],"correct":1,"explanation":"Una comprobación previa permite detectar amarres flojos, cierres mal asegurados y cargas inestables.","wrong":"No basta con revisar un único elemento: la carga y sus dispositivos deben quedar asegurados.","specific":false},{"id":"cap027","area":"CAP","topic":"Carga y estiba","text":"¿Cómo debe distribuirse, en general, la carga?","options":["De cualquier manera si no supera la MMA","De forma compatible con los límites por eje y la estabilidad","Toda al final del vehículo","Toda en la parte más alta"],"correct":1,"explanation":"Una distribución correcta respeta masas por eje, estabilidad y las instrucciones de carga.","wrong":"La distribución incorrecta puede sobrecargar ejes o alterar el comportamiento incluso sin superar la MMA.","specific":false},{"id":"cap028","area":"CAP","topic":"Carga y estiba","text":"¿Qué debe hacerse si la carga tapa las luces o la matrícula?","options":["Continuar si es de día","Colocar la carga de modo que no oculte los elementos obligatorios, respetando las reglas aplicables","Apagar las luces","Confiar en que el vehículo precedente avise"],"correct":1,"explanation":"La carga no debe ocultar luces, matrícula ni señalización obligatoria; cualquier saliente debe cumplir las reglas aplicables.","wrong":"La visibilidad de los elementos reglamentarios es necesaria también de día.","specific":false},{"id":"cap029","area":"CAP","topic":"Carga y estiba","text":"¿Para qué sirven los puntos de anclaje de la carga?","options":["Para aumentar la potencia del motor","Para proporcionar puntos adecuados donde fijar los sistemas de sujeción","Para medir el consumo","Para sustituir la inspección técnica"],"correct":1,"explanation":"Los anclajes deben ser adecuados y estar en buen estado para transmitir las fuerzas de sujeción.","wrong":"Un anclaje dañado o inadecuado puede fallar aunque la cinta parezca tensa.","specific":false},{"id":"cap030","area":"CAP","topic":"Carga y estiba","text":"Si durante una comprobación se detecta un amarre flojo, ¿qué procede?","options":["Continuar hasta el destino","Asegurar la carga en un lugar seguro antes de continuar","Aumentar la velocidad para reducir el tiempo de viaje","Poner el aviso de emergencia y seguir circulando"],"correct":1,"explanation":"La carga debe volver a asegurarse de forma segura antes de reanudar la marcha.","wrong":"Continuar con un amarre flojo permite que la carga se desplace y cause un accidente.","specific":false},{"id":"cap031","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué puede causar una presión insuficiente en los neumáticos?","options":["Menor deformación y menos calor siempre","Más deformación, calentamiento, consumo y desgaste","Una reducción garantizada de la distancia de frenado","Ningún efecto si el camión va vacío"],"correct":1,"explanation":"La presión incorrecta puede provocar calentamiento excesivo, desgaste irregular, mayor consumo y pérdida de seguridad.","wrong":"La presión influye en temperatura, desgaste, consumo y comportamiento del neumático.","specific":false},{"id":"cap032","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué debe hacer ante un testigo rojo de presión de aceite que permanece encendido?","options":["Acelerar para elevar la presión","Detenerse en un lugar seguro y seguir el procedimiento indicado por el fabricante","Ignorarlo hasta la próxima revisión","Añadir agua al depósito de refrigerante"],"correct":1,"explanation":"Una presión de aceite insuficiente puede dañar gravemente el motor; hay que parar de forma segura y comprobar la causa.","wrong":"No debe continuarse circulando con una advertencia crítica de lubricación.","specific":false},{"id":"cap033","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué función tiene el sistema de refrigeración del motor?","options":["Lubricar los frenos","Mantener la temperatura de funcionamiento dentro de límites adecuados","Controlar la presión de los neumáticos","Registrar los tiempos de conducción"],"correct":1,"explanation":"El sistema evacua calor y mantiene el motor en su rango de temperatura de funcionamiento.","wrong":"La refrigeración no sustituye a la lubricación ni controla los sistemas de frenado.","specific":false},{"id":"cap034","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué debe comprobarse en el sistema de frenos antes de un servicio?","options":["Solo el color de las llantas","Indicadores, fugas o anomalías y el estado general según la comprobación prevista","Únicamente la radio","Solo el nivel de combustible"],"correct":1,"explanation":"Los defectos de frenos comprometen directamente la seguridad y deben detectarse y comunicarse.","wrong":"Una comprobación de seguridad no puede limitarse a elementos estéticos o ajenos al frenado.","specific":false},{"id":"cap035","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué función tiene un ralentizador o retarder?","options":["Sustituir siempre por completo los frenos de servicio","Ayudar a controlar la velocidad y reducir el uso continuado de los frenos de servicio","Aumentar la carga máxima","Bloquear las ruedas traseras"],"correct":1,"explanation":"El ralentizador ayuda a controlar la velocidad, especialmente en descensos; no elimina la necesidad de frenos de servicio en todas las situaciones.","wrong":"Es un sistema auxiliar, no una sustitución absoluta del sistema de freno principal.","specific":false},{"id":"cap036","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Por qué conviene seleccionar la marcha antes de iniciar un descenso pronunciado?","options":["Para poder circular en punto muerto","Para disponer desde el principio de control y retención adecuados","Para evitar usar cualquier sistema de freno","Para aumentar la temperatura del motor"],"correct":1,"explanation":"Elegir antes una marcha adecuada permite controlar mejor la velocidad y reduce el riesgo de sobrecalentar los frenos.","wrong":"Cambiar tarde o bajar en punto muerto puede reducir el control del vehículo.","specific":false},{"id":"cap037","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué debe hacerse si se observa una fuga importante de un fluido del vehículo?","options":["Ignorarla si el motor funciona","Detenerse en un lugar seguro, identificar el riesgo y solicitar revisión","Taparla con papel y continuar","Acelerar para llegar al taller"],"correct":1,"explanation":"Una fuga puede indicar una avería que afecte a frenos, dirección, refrigeración u otros sistemas; debe evaluarse con seguridad.","wrong":"Que el vehículo todavía avance no significa que sea seguro continuar.","specific":false},{"id":"cap038","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué describe mejor el mantenimiento preventivo?","options":["Reparar solo después de una avería grave","Realizar comprobaciones y operaciones programadas para reducir fallos","Eliminar las inspecciones del conductor","Cambiar piezas al azar"],"correct":1,"explanation":"El mantenimiento preventivo sigue revisiones programadas para detectar desgaste y reducir averías.","wrong":"Esperar a que se produzca una avería aumenta riesgos y costes.","specific":false},{"id":"cap039","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué debe comprobarse en un acoplamiento antes de salir con un remolque?","options":["Solo que el remolque tenga matrícula","Que el acoplamiento esté correctamente asegurado y las conexiones necesarias estén conectadas","Solo el color del enganche","Nada si el remolque está vacío"],"correct":1,"explanation":"El cierre del acoplamiento y las conexiones deben comprobarse conforme al procedimiento del fabricante y las normas aplicables.","wrong":"Un remolque vacío también puede desacoplarse si el enganche no está correctamente asegurado.","specific":false},{"id":"cap040","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Cuál es una actuación correcta ante una avería que compromete la seguridad?","options":["Continuar despacio hasta terminar la ruta","Parar de forma segura, señalizar según la normativa y gestionar la reparación","Desactivar el sistema afectado","Pedir a otro conductor que empuje el vehículo en circulación"],"correct":1,"explanation":"La prioridad es proteger a las personas y no continuar si el vehículo no está en condiciones seguras.","wrong":"Reducir la velocidad no convierte en seguro un vehículo con un defecto crítico.","specific":false},{"id":"cap041","area":"CAP","topic":"Salud y emergencias","text":"¿Qué significan las siglas PAS en primeros auxilios?","options":["Parar, Acelerar, Salir","Proteger, Avisar, Socorrer","Prevenir, Andar, Señalizar","Preguntar, Atender, Seguir"],"correct":1,"explanation":"PAS resume la secuencia básica: proteger el lugar, avisar a emergencias y socorrer dentro de las propias capacidades.","wrong":"La prioridad es asegurar la escena y pedir ayuda antes de intervenir de forma insegura.","specific":false},{"id":"cap042","area":"CAP","topic":"Salud y emergencias","text":"Al llegar a un accidente, ¿qué debe hacerse antes de auxiliar?","options":["Entrar inmediatamente en la calzada","Comprobar que la zona es segura y protegerse de riesgos","Mover a todas las víctimas","Retirar siempre los cascos de los motoristas"],"correct":1,"explanation":"No se debe crear una segunda víctima; evalúa los riesgos y protege la escena antes de intervenir.","wrong":"Actuar sin valorar el tráfico, fuego u otros peligros puede agravar la emergencia.","specific":false},{"id":"cap043","area":"CAP","topic":"Salud y emergencias","text":"¿Cuándo debe moverse a una víctima de accidente?","options":["Siempre para sentarla","Solo si existe un peligro inmediato o la maniobra es necesaria para salvarla, evitando daños adicionales","Para comprobar si puede caminar","Nunca, incluso ante fuego"],"correct":1,"explanation":"Debe evitarse mover innecesariamente a una víctima, especialmente si se sospechan lesiones de columna; una amenaza inmediata puede exigir actuar.","wrong":"Mover sin necesidad puede agravar lesiones, pero un peligro inmediato puede obligar a evacuar.","specific":false},{"id":"cap044","area":"CAP","topic":"Salud y emergencias","text":"Ante una hemorragia externa importante, ¿qué medida básica suele aplicarse mientras llega ayuda?","options":["Aplicar presión directa con material adecuado, si es seguro","Dar comida y bebida","Lavar con combustible","Pedir a la persona que camine"],"correct":0,"explanation":"La presión directa sobre la herida es una medida básica para controlar muchas hemorragias externas mientras se solicita ayuda.","wrong":"No se debe dar comida ni bebida ni usar sustancias inadecuadas sobre la herida.","specific":false},{"id":"cap045","area":"CAP","topic":"Salud y emergencias","text":"Si se produce un incendio en el vehículo, ¿qué prioridad tiene el conductor?","options":["Salvar la mercancía antes que a las personas","Detenerse con seguridad, evacuar y alejar a las personas del peligro","Abrir todos los compartimentos sin valorar el riesgo","Continuar hasta una estación de servicio"],"correct":1,"explanation":"La prioridad es la seguridad de las personas: parar, apagar el motor si procede, evacuar y alejarse; solo se intentará extinguir si es seguro.","wrong":"La mercancía nunca debe anteponerse a la vida; un incendio puede propagarse rápidamente.","specific":false},{"id":"cap046","area":"CAP","topic":"Salud y emergencias","text":"Si revienta un neumático durante la marcha, ¿qué actuación es más adecuada?","options":["Frenar bruscamente","Sujetar firmemente el volante, evitar movimientos bruscos y reducir progresivamente","Girar de inmediato al arcén","Acelerar al máximo"],"correct":1,"explanation":"Mantener el control, evitar frenazos y reducir gradualmente ayuda a estabilizar el vehículo.","wrong":"Una reacción brusca puede provocar pérdida de control.","specific":false},{"id":"cap047","area":"CAP","topic":"Salud y emergencias","text":"¿Cómo puede afectar un medicamento a la conducción?","options":["Nunca afecta si está recetado","Puede alterar atención, coordinación o tiempo de reacción, según el medicamento","Solo afecta a vehículos ligeros","Solo afecta si se toma con comida"],"correct":1,"explanation":"Algunos medicamentos pueden causar somnolencia, mareo u otros efectos; hay que revisar la información y consultar al profesional sanitario.","wrong":"La prescripción no garantiza que el medicamento sea compatible con conducir en todas las circunstancias.","specific":false},{"id":"cap048","area":"CAP","topic":"Salud y emergencias","text":"¿Cuál es una señal habitual de fatiga al volante?","options":["Mayor concentración sostenida","Bostezos repetidos y dificultad para mantener la atención","Mejor visión nocturna","Menor tiempo de reacción"],"correct":1,"explanation":"Bostezos, párpados pesados, distracciones y reacciones lentas son señales de fatiga.","wrong":"La fatiga reduce el rendimiento; no debe confundirse con un estado de alerta.","specific":false},{"id":"cap049","area":"CAP","topic":"Salud y emergencias","text":"¿Cuál es una medida ergonómica correcta al conducir?","options":["Ajustar asiento y espejos con el vehículo en marcha","Ajustar asiento, volante y espejos antes de iniciar la marcha","Mantener siempre el asiento reclinado al máximo","Girar el tronco para alcanzar mandos lejanos"],"correct":1,"explanation":"Una posición ajustada antes de circular mejora visibilidad, control y comodidad, y reduce lesiones musculoesqueléticas.","wrong":"Los ajustes deben hacerse con el vehículo detenido y la postura debe permitir controlar los mandos.","specific":false},{"id":"cap050","area":"CAP","topic":"Salud y emergencias","text":"¿Cuándo deben utilizarse equipos de protección individual en una operación de carga?","options":["Solo cuando el conductor lo prefiera","Cuando lo exijan la evaluación de riesgos, las instrucciones y la normativa aplicable","Nunca si la operación dura poco","Solo después de sufrir un accidente"],"correct":1,"explanation":"Los EPI se utilizan según los riesgos de la tarea, las instrucciones de seguridad y los requisitos aplicables.","wrong":"La duración corta de una tarea no elimina el riesgo ni las obligaciones preventivas.","specific":false},{"id":"cap051","area":"CAP","topic":"Documentación y normativa","text":"¿Qué relación existe entre el permiso C y el CAP?","options":["Son exactamente el mismo documento","El permiso habilita para conducir la categoría y el CAP acredita la cualificación profesional cuando es exigible","El CAP sustituye siempre al permiso","El permiso C solo es válido si se lleva un albarán"],"correct":1,"explanation":"Permiso y CAP tienen funciones diferentes; para ciertos servicios profesionales se deben cumplir ambos requisitos y las posibles excepciones.","wrong":"Uno no sustituye al otro: cada documento acredita una condición distinta.","specific":false},{"id":"cap052","area":"CAP","topic":"Documentación y normativa","text":"¿Qué debe comprobarse respecto a la documentación del servicio?","options":["Que corresponde al vehículo, la mercancía y la operación real","Solo que tenga muchas páginas","Que esté a nombre de cualquier empresa","Que no coincida con la carga para evitar sanciones"],"correct":0,"explanation":"La documentación debe ser coherente con el servicio real y estar disponible cuando la normativa la exija.","wrong":"Una discrepancia documental puede generar problemas de seguridad, trazabilidad y cumplimiento.","specific":false},{"id":"cap053","area":"CAP","topic":"Documentación y normativa","text":"¿Qué función cumple, en términos generales, la carta de porte CMR?","options":["Es el permiso de conducción del conductor","Documenta determinados transportes internacionales de mercancías por carretera sujetos al Convenio CMR","Sustituye al tacógrafo","Autoriza automáticamente cualquier mercancía peligrosa"],"correct":1,"explanation":"La CMR documenta el contrato de transporte internacional por carretera cuando se aplica el Convenio; no reemplaza otras autorizaciones.","wrong":"No es un permiso de conducción ni sustituye documentación especial requerida.","specific":false},{"id":"cap054","area":"CAP","topic":"Documentación y normativa","text":"¿Qué debe hacer el conductor si detecta daños visibles en la mercancía al recibirla?","options":["Firmar sin anotarlos siempre","Dejar constancia de la incidencia y comunicarla según el procedimiento antes de continuar","Ocultar los daños al destinatario","Modificar por su cuenta el contrato"],"correct":1,"explanation":"Registrar las reservas o incidencias de forma objetiva ayuda a conservar la trazabilidad y gestionar responsabilidades.","wrong":"Ignorar los daños puede dificultar la investigación y la reclamación posterior.","specific":false},{"id":"cap055","area":"CAP","topic":"Documentación y normativa","text":"¿Qué describe mejor el cabotaje en el transporte por carretera?","options":["Un transporte internacional sin fronteras","Un transporte nacional realizado temporalmente por un transportista no establecido en ese Estado, sujeto a condiciones legales","Un transporte exclusivo de mercancías peligrosas","Una maniobra de estacionamiento"],"correct":1,"explanation":"El cabotaje es una operación de transporte nacional realizada temporalmente por un transportista no establecido en el país anfitrión, bajo reglas específicas.","wrong":"No es una modalidad de conducción ni está exenta de requisitos.","specific":false},{"id":"cap056","area":"CAP","topic":"Documentación y normativa","text":"¿Qué debe hacer un conductor si una autorización o documento obligatorio no está disponible?","options":["Inventar un número de autorización","Comprobar el requisito y resolver la incidencia antes de realizar una operación que lo exija","Usar el documento de otro vehículo sin comprobarlo","Continuar siempre porque la carga ya está preparada"],"correct":1,"explanation":"Debe verificarse qué documento se exige y no iniciar una operación que requiera una autorización inexistente o inválida.","wrong":"La urgencia comercial no elimina los requisitos legales.","specific":false},{"id":"cap057","area":"CAP","topic":"Documentación y normativa","text":"¿Qué principio debe seguirse al registrar las actividades en el tacógrafo?","options":["Registrar solo los períodos de conducción","Reflejar fielmente las actividades reales conforme a las reglas aplicables","Cambiar el registro para que coincida con la planificación","Compartir la tarjeta con otro conductor"],"correct":1,"explanation":"Los registros deben ser veraces y corresponder a las actividades efectivamente realizadas.","wrong":"Manipular o compartir la tarjeta perjudica la trazabilidad y puede infringir la normativa.","specific":false},{"id":"cap058","area":"CAP","topic":"Documentación y normativa","text":"Antes de circular por una ruta desconocida, ¿qué conviene comprobar para un vehículo pesado?","options":["Solo dónde hay cafeterías","Restricciones de masa, altura, anchura, itinerario y condiciones de acceso","Solo el número de semáforos","Que la ruta sea la más corta aunque tenga gálibos insuficientes"],"correct":1,"explanation":"La planificación debe considerar dimensiones, masas, restricciones y condiciones de la vía para evitar situaciones peligrosas o ilegales.","wrong":"La ruta más corta no siempre es apta para un vehículo pesado.","specific":false},{"id":"cap059","area":"CAP","topic":"Documentación y normativa","text":"¿Qué debe hacerse si la carga no coincide con la documentación entregada?","options":["Corregir los documentos sin autorización","Detener la operación cuando proceda y aclarar la discrepancia con la persona responsable","Ignorar la diferencia si el vehículo cabe","Eliminar los documentos"],"correct":1,"explanation":"La discrepancia debe aclararse y documentarse con las personas responsables antes de continuar si afecta a la legalidad o seguridad.","wrong":"No se deben alterar documentos ni ignorar diferencias relevantes.","specific":false},{"id":"cap060","area":"CAP","topic":"Documentación y normativa","text":"¿Qué documento o condición demuestra la cualificación CAP cuando la actividad la exige?","options":["La factura del combustible","El certificado o tarjeta de cualificación vigente según el sistema aplicable","El permiso de circulación del camión únicamente","El albarán de entrega"],"correct":1,"explanation":"La cualificación profesional se acredita mediante el documento o registro previsto por el sistema CAP aplicable.","wrong":"La factura, el permiso de circulación y el albarán cumplen otras funciones.","specific":false},{"id":"cap061","area":"CAP","topic":"Conducción eficiente","text":"¿Qué técnica suele reducir el consumo y el desgaste?","options":["Acelerar y frenar bruscamente","Anticipar el tráfico y acelerar de forma progresiva","Circular siempre a máximas revoluciones","Mantener el motor al ralentí en cada parada larga"],"correct":1,"explanation":"La anticipación y la conducción suave reducen frenadas, aceleraciones innecesarias, consumo y desgaste.","wrong":"Las aceleraciones bruscas y el ralentí innecesario aumentan consumo y desgaste.","specific":false},{"id":"cap062","area":"CAP","topic":"Conducción eficiente","text":"¿Qué efecto puede tener una presión incorrecta de neumáticos sobre el consumo?","options":["Ninguno","Puede aumentar la resistencia a la rodadura y el consumo","Siempre reduce el consumo","Solo afecta al color del neumático"],"correct":1,"explanation":"La presión debe mantenerse dentro de las especificaciones porque influye en la resistencia, el desgaste y la seguridad.","wrong":"Una presión incorrecta no es inocua y puede aumentar consumo y riesgos.","specific":false},{"id":"cap063","area":"CAP","topic":"Conducción eficiente","text":"¿Por qué conviene evitar el ralentí innecesario?","options":["Porque siempre descarga los frenos","Porque consume combustible y genera emisiones sin avanzar","Porque aumenta la carga útil","Porque mejora la adherencia"],"correct":1,"explanation":"Reducir el ralentí innecesario ayuda a disminuir consumo, emisiones y ruido.","wrong":"El motor en marcha consume combustible aunque el vehículo no se desplace.","specific":false},{"id":"cap064","area":"CAP","topic":"Conducción eficiente","text":"¿Qué debe priorizarse al planificar una ruta eficiente?","options":["El camino más corto sin comprobar restricciones","Combinar seguridad, restricciones del vehículo, tráfico, entrega y descansos","Evitar todas las autopistas","Ignorar los horarios de carga"],"correct":1,"explanation":"Una ruta eficiente debe ser viable y segura, respetar restricciones y permitir cumplir descansos y entregas.","wrong":"La eficiencia no justifica ignorar restricciones legales ni condiciones de seguridad.","specific":false},{"id":"cap065","area":"CAP","topic":"Conducción eficiente","text":"¿Qué aporta el mantenimiento preventivo a la eficiencia?","options":["Nada si el vehículo tiene motor moderno","Ayuda a mantener sistemas, consumo y emisiones dentro de condiciones adecuadas","Solo cambia el aspecto exterior","Permite superar la MMA"],"correct":1,"explanation":"Un vehículo bien mantenido puede funcionar de forma más fiable y eficiente, además de reducir averías.","wrong":"El mantenimiento no aumenta la masa autorizada ni es meramente estético.","specific":false},{"id":"cap066","area":"CAP","topic":"Servicio profesional","text":"¿Qué debe hacer el conductor si recibe instrucciones que parecen inseguras o ilegales?","options":["Cumplirlas sin preguntar","Plantear la incidencia y seguir el procedimiento de seguridad y la normativa","Borrar los mensajes","Aumentar la velocidad para terminar antes"],"correct":1,"explanation":"La presión de tiempo no debe llevar a ignorar la seguridad o la normativa; la incidencia debe comunicarse y resolverse.","wrong":"La responsabilidad profesional incluye no ejecutar instrucciones inseguras o contrarias a la normativa.","specific":false},{"id":"cap067","area":"CAP","topic":"Servicio profesional","text":"¿Qué conducta mejora la trazabilidad de una entrega?","options":["Registrar solo las entregas sin problemas","Documentar de forma objetiva las incidencias, horarios y reservas pertinentes","Firmar por el destinatario sin autorización","Modificar la cantidad entregada para cuadrar"],"correct":1,"explanation":"Los registros objetivos ayudan a resolver incidencias y demostrar qué ocurrió durante el transporte.","wrong":"Alterar o inventar registros compromete la trazabilidad y la responsabilidad.","specific":false},{"id":"cap068","area":"CAP","topic":"Servicio profesional","text":"¿Qué debe hacer un conductor si se le exige conducir cuando está demasiado fatigado?","options":["Continuar por responsabilidad comercial","Comunicar la situación y no iniciar o continuar la conducción hasta poder hacerlo con seguridad","Tomar bebidas energéticas y acelerar","Desconectar el tacógrafo"],"correct":1,"explanation":"La fatiga es un riesgo de seguridad; se debe actuar para evitar una conducción peligrosa y cumplir los descansos.","wrong":"Los estimulantes no sustituyen al descanso y nunca justifican manipular el tacógrafo.","specific":false},{"id":"cap069","area":"CAP","topic":"Servicio profesional","text":"¿Qué práctica es correcta al manipular cargas manualmente?","options":["Girar el tronco mientras se levanta una carga pesada","Evaluar el peso, usar ayudas disponibles y mantener una técnica de levantamiento segura","Levantar siempre con la espalda doblada","Ignorar los límites personales"],"correct":1,"explanation":"La evaluación, las ayudas mecánicas y una técnica adecuada reducen lesiones musculoesqueléticas.","wrong":"Las torsiones y posturas inadecuadas aumentan el riesgo de lesión.","specific":false},{"id":"cap070","area":"CAP","topic":"Servicio profesional","text":"¿Qué debe hacerse antes de comenzar una operación de carga en una zona de trabajo?","options":["Entrar sin comprobar el entorno","Identificar riesgos, seguir las instrucciones del lugar y utilizar los EPI exigidos","Dejar el vehículo sin asegurar","Usar el móvil mientras se maniobra"],"correct":1,"explanation":"Las operaciones de carga requieren coordinación, control del entorno y cumplimiento de las instrucciones preventivas.","wrong":"Ignorar los riesgos del lugar puede causar atropellos, golpes o caídas.","specific":false},{"id":"cap071","area":"CAP","topic":"Servicio profesional","text":"¿Cómo debe tratarse la información personal de un cliente o destinatario?","options":["Compartirla libremente con cualquiera","Usarla solo para fines legítimos del servicio y protegerla","Publicarla para demostrar una entrega","Dejar los documentos visibles en cualquier lugar"],"correct":1,"explanation":"Los datos deben tratarse con confidencialidad y conforme a las obligaciones de protección de datos.","wrong":"La información de clientes no debe divulgarse sin una base legítima.","specific":false},{"id":"cap072","area":"CAP","topic":"Servicio profesional","text":"¿Cuál es una respuesta profesional ante una queja por retraso?","options":["Discutir y culpar al cliente","Informar con claridad, comunicar la situación y seguir el procedimiento de la empresa","Prometer una hora imposible","Ocultar el retraso"],"correct":1,"explanation":"La comunicación clara y veraz permite gestionar expectativas y resolver incidencias.","wrong":"Ocultar el problema o prometer algo irreal empeora la gestión del servicio.","specific":false},{"id":"cap073","area":"CAP","topic":"Servicio profesional","text":"¿Qué debe hacerse con un defecto que no impide arrancar, pero puede comprometer la seguridad?","options":["Ignorarlo hasta la próxima inspección","Comunicarlo y determinar si el vehículo puede circular con seguridad antes de seguir","Borrar el aviso del cuadro","Pedir al cliente que decida"],"correct":1,"explanation":"El hecho de que el vehículo arranque no demuestra que sea seguro; el defecto debe evaluarse y resolverse.","wrong":"Los defectos de seguridad requieren una valoración adecuada, no una decisión basada solo en si el motor funciona.","specific":false},{"id":"cap074","area":"CAP","topic":"Servicio profesional","text":"¿Por qué es importante asegurar el vehículo durante la carga y descarga?","options":["Solo para ahorrar combustible","Para evitar desplazamientos inesperados y proteger a trabajadores y mercancía","Para reducir la masa del vehículo","Para sustituir los calzos cuando sean necesarios"],"correct":1,"explanation":"El vehículo debe quedar inmovilizado y asegurado conforme al procedimiento del lugar y las condiciones de la operación.","wrong":"Un vehículo que se mueve inesperadamente puede causar atropellos, atrapamientos o daños.","specific":false},{"id":"cap075","area":"CAP","topic":"Servicio profesional","text":"¿Qué principio debe seguirse al informar sobre una incidencia en el transporte?","options":["Añadir opiniones no verificadas","Describir hechos comprobables, hora y medidas adoptadas","Eliminar detalles incómodos","Esperar semanas para que se olvide"],"correct":1,"explanation":"Un registro claro, oportuno y objetivo facilita la respuesta y la trazabilidad.","wrong":"Las opiniones no verificadas o la omisión deliberada dificultan la investigación.","specific":false},{"id":"cap076","area":"CAP","topic":"Mercancías peligrosas","text":"¿Qué regula principalmente el ADR en el transporte por carretera?","options":["La obtención del permiso C","El transporte de mercancías peligrosas por carretera dentro de su ámbito","Los horarios de entrega de supermercados","La inspección de tacógrafos"],"correct":1,"explanation":"El ADR establece requisitos para el transporte por carretera de mercancías peligrosas, según clasificación y condiciones de aplicación.","wrong":"El ADR no sustituye al permiso de conducción ni regula todos los aspectos del transporte ordinario.","specific":true},{"id":"cap077","area":"CAP","topic":"Mercancías peligrosas","text":"Ante una fuga de una mercancía peligrosa desconocida, ¿qué debe hacerse?","options":["Tocar el líquido para identificarlo","Evitar el contacto, alejarse, proteger la zona y avisar siguiendo las instrucciones aplicables","Lavar la fuga hacia una alcantarilla","Continuar conduciendo con las puertas abiertas"],"correct":1,"explanation":"Ante una sustancia desconocida hay que evitar la exposición, alejar a las personas y avisar a los servicios competentes.","wrong":"El contacto o la dispersión de la sustancia puede agravar el riesgo.","specific":true},{"id":"cap078","area":"CAP","topic":"Mercancías peligrosas","text":"¿Para qué sirven las etiquetas de peligro en mercancías peligrosas?","options":["Para indicar el precio de venta","Para comunicar peligros de la materia durante el transporte","Para sustituir toda la documentación","Para identificar al conductor"],"correct":1,"explanation":"Las etiquetas y marcas advierten de los riesgos y forman parte de la comunicación de peligro exigida según el caso.","wrong":"No indican el precio ni sustituyen documentos y procedimientos requeridos.","specific":true},{"id":"cap079","area":"CAP","topic":"Mercancías peligrosas","text":"¿Qué debe comprobarse antes de transportar mercancías peligrosas?","options":["Solo que el embalaje sea del color correcto","Que la mercancía, embalaje, marcas, documentos, equipos y formación cumplan los requisitos aplicables","Solo que la carga no haga ruido","Que el cliente firme sin leer"],"correct":1,"explanation":"Los requisitos dependen de la materia y la operación; deben verificarse todos los elementos exigidos antes de salir.","wrong":"Una única comprobación visual no garantiza el cumplimiento de los requisitos ADR.","specific":true},{"id":"cap080","area":"CAP","topic":"Mercancías peligrosas","text":"¿Qué debe hacerse con las instrucciones escritas de emergencia ADR cuando sean exigibles?","options":["Dejarlas en la oficina","Llevarlas accesibles en la cabina y conocer cómo utilizarlas","Guardarlas bajo la carga","Entregarlas solo al destinatario al llegar"],"correct":1,"explanation":"Las instrucciones escritas deben estar disponibles en la cabina cuando sean exigibles y el conductor debe saber cómo actuar.","wrong":"No sirven si no están accesibles durante una emergencia.","specific":true},{"id":"cap081","area":"CAP","topic":"Carga especializada","text":"¿Qué función cumple una cincha de amarre correctamente seleccionada?","options":["Aumentar la potencia del camión","Contribuir a impedir el desplazamiento de la carga conforme a su capacidad y uso","Sustituir cualquier punto de anclaje","Permitir superar la MMA"],"correct":1,"explanation":"El amarre debe ser adecuado a la carga, la capacidad del equipo y los puntos de anclaje disponibles.","wrong":"Una cincha no aumenta la masa autorizada ni funciona correctamente si se usa con anclajes inadecuados.","specific":true},{"id":"cap082","area":"CAP","topic":"Carga especializada","text":"¿Qué debe hacerse si una cincha presenta cortes o daños importantes?","options":["Usarla con más tensión","Retirarla del servicio y sustituirla por un elemento adecuado","Anudarla para acortarla","Cubrir el daño con papel"],"correct":1,"explanation":"Los elementos de sujeción dañados pueden romperse bajo carga y no deben utilizarse si su seguridad está comprometida.","wrong":"Aumentar la tensión o improvisar una reparación puede provocar un fallo del amarre.","specific":true},{"id":"cap083","area":"CAP","topic":"Carga especializada","text":"¿Por qué deben comprobarse los cierres de una caja o contenedor?","options":["Solo para evitar ruidos","Porque un cierre incorrecto puede permitir la apertura o caída de la carga","Para reducir el consumo del motor","Para aumentar el peso autorizado"],"correct":1,"explanation":"Los cierres deben quedar asegurados para impedir aperturas o desplazamientos durante la marcha.","wrong":"El cierre es una barrera de seguridad, no un elemento meramente acústico.","specific":true},{"id":"cap084","area":"CAP","topic":"Carga especializada","text":"Al transportar una carga frágil, ¿qué debe priorizarse?","options":["Acelerar para reducir el tiempo","Estiba estable, protección adecuada y conducción suave","Colocarla siempre encima de toda la carga","Eliminar los amarres para evitar presión"],"correct":1,"explanation":"La mercancía frágil necesita protección, estabilidad y una conducción que reduzca golpes y movimientos.","wrong":"La rapidez o la ausencia de sujeción aumentan el riesgo de daños.","specific":true},{"id":"cap085","area":"CAP","topic":"Carga especializada","text":"¿Qué es esencial al transportar una carga con centro de gravedad desplazado?","options":["Ignorar su posición si está bien embalada","Distribuirla y sujetarla según las instrucciones y los límites por eje y estabilidad","Colocarla siempre en un lateral","Conducir más rápido en curvas"],"correct":1,"explanation":"La posición de la masa influye en la carga por eje y la estabilidad; debe planificarse y sujetarse correctamente.","wrong":"El embalaje por sí solo no corrige una distribución peligrosa.","specific":true},{"id":"cap086","area":"CAP","topic":"Temperatura controlada","text":"En un transporte a temperatura controlada, ¿qué debe comprobarse antes de cargar?","options":["Solo que el equipo haga ruido","Que el equipo funcione y que la temperatura y las condiciones sean adecuadas para la mercancía","Que la puerta cierre sin revisar la consigna","Únicamente el nivel de combustible"],"correct":1,"explanation":"El vehículo y la consigna deben ser adecuados al producto y a las instrucciones de transporte.","wrong":"Un equipo encendido no garantiza por sí solo la temperatura correcta.","specific":true},{"id":"cap087","area":"CAP","topic":"Temperatura controlada","text":"¿Qué debe hacerse si se detecta una desviación relevante de temperatura durante el transporte?","options":["Borrar el registro","Registrar y comunicar la incidencia y aplicar el procedimiento de la mercancía","Abrir las puertas sin evaluar el efecto","Cambiar la consigna arbitrariamente"],"correct":1,"explanation":"La desviación debe documentarse y gestionarse según las instrucciones del producto y del operador.","wrong":"Ocultar la incidencia o cambiar la consigna sin criterio puede comprometer la mercancía.","specific":true},{"id":"cap088","area":"CAP","topic":"Temperatura controlada","text":"¿Por qué conviene limitar la apertura de puertas en un transporte refrigerado?","options":["Para aumentar el ruido","Para reducir intercambios térmicos y mantener la temperatura requerida","Para que el motor consuma más","Porque las puertas no deben abrirse nunca"],"correct":1,"explanation":"Las aperturas prolongadas permiten la entrada de aire exterior y pueden alterar la temperatura de la carga.","wrong":"No se trata de no abrir nunca, sino de hacerlo de forma planificada y el menor tiempo necesario.","specific":true},{"id":"cap089","area":"CAP","topic":"Temperatura controlada","text":"¿Qué debe hacerse con una mercancía que requiere una temperatura específica?","options":["Aplicar siempre la misma temperatura a todos los productos","Respetar la consigna y las instrucciones específicas del producto","Usar la temperatura exterior","Apagar el equipo en cuanto comienza el viaje"],"correct":1,"explanation":"Las temperaturas requeridas varían según la mercancía; deben seguirse las especificaciones aplicables.","wrong":"No existe una única temperatura adecuada para todas las mercancías.","specific":true},{"id":"cap090","area":"CAP","topic":"Temperatura controlada","text":"¿Qué medida ayuda a evitar contaminación cruzada en cargas alimentarias?","options":["Mezclar productos incompatibles","Mantener limpieza, separación y condiciones de transporte adecuadas","Reutilizar envases sucios","Ignorar olores o derrames"],"correct":1,"explanation":"La limpieza y separación de productos incompatibles ayuda a proteger la seguridad y calidad alimentaria.","wrong":"La contaminación puede producirse aunque la temperatura sea correcta.","specific":true},{"id":"cap091","area":"CAP","topic":"Animales vivos","text":"En el transporte de animales vivos, ¿qué debe priorizarse?","options":["La máxima densidad posible","Bienestar, ventilación, espacio y manejo conforme a los requisitos aplicables","Evitar cualquier parada aunque sea necesaria","Reducir la ventilación para conservar calor"],"correct":1,"explanation":"El transporte debe respetar los requisitos de bienestar animal, espacio, ventilación y manejo según la especie y el trayecto.","wrong":"La densidad excesiva y la mala ventilación pueden causar lesiones, estrés o muerte.","specific":true},{"id":"cap092","area":"CAP","topic":"Animales vivos","text":"¿Qué debe hacerse si un animal muestra signos de sufrimiento durante el transporte?","options":["Ignorarlo hasta la descarga","Actuar según el procedimiento de bienestar y solicitar ayuda competente cuando proceda","Aumentar la velocidad para terminar antes","Dar medicamentos sin autorización"],"correct":1,"explanation":"Los signos de sufrimiento deben atenderse de forma adecuada, respetando los procedimientos y la normativa de bienestar.","wrong":"Ignorar el sufrimiento o medicar sin autorización puede agravar la situación.","specific":true},{"id":"cap093","area":"CAP","topic":"Animales vivos","text":"¿Por qué es importante la ventilación en el transporte de animales vivos?","options":["Solo para evitar olores al conductor","Para mantener condiciones ambientales adecuadas y reducir estrés y riesgos térmicos","Para aumentar la masa del vehículo","Para sustituir el agua"],"correct":1,"explanation":"La ventilación contribuye a controlar temperatura y calidad del aire; sus necesidades dependen de la carga y las condiciones.","wrong":"La ventilación no sustituye otras necesidades de bienestar, como agua, espacio o descanso.","specific":true},{"id":"cap094","area":"CAP","topic":"Animales vivos","text":"¿Qué debe comprobarse antes de cargar animales vivos?","options":["Solo el combustible","Aptitud del vehículo, separación, espacio, ventilación y condiciones de manejo requeridas","Que la carga vaya suelta","Únicamente la matrícula del remolque"],"correct":1,"explanation":"La preparación del vehículo y del viaje debe ajustarse a la especie, duración y requisitos legales aplicables.","wrong":"El combustible no es la única condición para un transporte seguro y respetuoso con los animales.","specific":true},{"id":"cap095","area":"CAP","topic":"Animales vivos","text":"¿Qué debe hacerse con el vehículo y los equipos tras transportar animales, cuando corresponda?","options":["No limpiarlos nunca","Limpiarlos y desinfectarlos conforme a los requisitos y procedimientos aplicables","Solo pintar la carrocería","Usarlos inmediatamente para cualquier carga sin comprobarlos"],"correct":1,"explanation":"La limpieza y desinfección adecuadas ayudan a reducir la transmisión de enfermedades y contaminación.","wrong":"La higiene es parte de la bioseguridad y debe ajustarse al tipo de transporte.","specific":true},{"id":"cap096","area":"CAP","topic":"Operativa documental","text":"En un transporte internacional sujeto al Convenio CMR, ¿qué conviene hacer si hay reservas o daños visibles?","options":["Firmar sin observaciones aunque existan daños","Dejar constancia objetiva de las reservas y comunicarlo según el procedimiento","Cambiar el nombre del destinatario","Destruir la carta de porte"],"correct":1,"explanation":"Las reservas claras y oportunas ayudan a documentar el estado de la mercancía y gestionar responsabilidades.","wrong":"Firmar sin reflejar daños puede dificultar la prueba y la reclamación.","specific":true},{"id":"cap097","area":"CAP","topic":"Operativa documental","text":"¿Qué debe hacer el conductor si el sello de seguridad de un contenedor no coincide con el documento?","options":["Cambiar el número en el documento","No ignorar la discrepancia; comunicarla y seguir el procedimiento de seguridad","Romper el sello y continuar sin registrar nada","Entregar el contenedor a cualquiera"],"correct":1,"explanation":"Una discrepancia de precinto puede afectar a la seguridad y trazabilidad y debe gestionarse y registrarse.","wrong":"Modificar datos o romper el precinto sin autorización puede comprometer la cadena de custodia.","specific":true},{"id":"cap098","area":"CAP","topic":"Operativa documental","text":"¿Cuál es una práctica correcta al entregar mercancía?","options":["Dejarla en cualquier lugar sin confirmar","Verificar destinatario, cantidades y comprobantes según el procedimiento","Firmar en nombre de otra persona","Entregar documentos personales a terceros no autorizados"],"correct":1,"explanation":"La entrega debe verificarse y documentarse conforme a las instrucciones del servicio.","wrong":"La entrega sin comprobación puede generar pérdidas, disputas o riesgos de seguridad.","specific":true},{"id":"cap099","area":"CAP","topic":"Operativa documental","text":"¿Qué debe hacerse si el destinatario rechaza una parte de la carga?","options":["Ocultar el rechazo","Documentar la incidencia y solicitar instrucciones al responsable de la operación","Dejar la mercancía en la vía pública","Modificar la cantidad en la factura sin avisar"],"correct":1,"explanation":"El rechazo debe registrarse y gestionarse mediante el procedimiento de incidencias, sin alterar documentación unilateralmente.","wrong":"Ocultar o modificar la información impide resolver la incidencia correctamente.","specific":true},{"id":"cap100","area":"CAP","topic":"Operativa documental","text":"¿Por qué es importante comprobar la identidad del destinatario cuando el procedimiento lo exige?","options":["Para retrasar la entrega sin motivo","Para reducir el riesgo de entrega a una persona o entidad no autorizada","Para sustituir la carta de porte","Para evitar registrar la entrega"],"correct":1,"explanation":"La verificación protege la mercancía y ayuda a demostrar que se entregó a quien correspondía.","wrong":"No sustituye otros documentos, pero forma parte del control de entrega cuando se requiere.","specific":true},{"id":"c001","area":"C","topic":"Vehículo pesado","text":"¿Qué autoriza, con carácter general, el permiso C en España?","options":["Conducir cualquier autobús","Conducir determinados camiones de más de 3.500 kg de MMA, dentro de las condiciones de la categoría","Conducir motocicletas de cualquier cilindrada","Conducir cualquier conjunto articulado sin límite"],"correct":1,"explanation":"El permiso C habilita para conducir vehículos de la categoría de camiones que define la normativa, con las condiciones y límites aplicables.","wrong":"No autoriza automáticamente autobuses ni todos los conjuntos con remolque pesado.","specific":false},{"id":"c002","area":"C","topic":"Vehículo pesado","text":"Con un vehículo de categoría C, ¿qué remolque puede llevarse dentro de la habilitación ordinaria de la categoría?","options":["Cualquier semirremolque","Un remolque ligero de hasta 750 kg de MMA, sujeto a la normativa","Ningún remolque en ningún caso","Solo remolques de pasajeros"],"correct":1,"explanation":"La categoría C permite, con carácter general, acoplar un remolque de hasta 750 kg de MMA; los conjuntos más pesados pueden requerir C+E.","wrong":"Un remolque de mayor MMA puede exigir otra categoría, como C+E.","specific":false},{"id":"c003","area":"C","topic":"Vehículo pesado","text":"¿Para qué sirve la categoría C+E?","options":["Para conducir solo turismos","Para conjuntos de vehículos de categoría C con remolque o semirremolque dentro de la categoría E","Para conducir vehículos agrícolas exclusivamente","Para sustituir al CAP"],"correct":1,"explanation":"C+E amplía la habilitación para determinados conjuntos pesados con remolque o semirremolque.","wrong":"No es una sustitución del CAP ni una categoría de turismo.","specific":false},{"id":"c004","area":"C","topic":"Vehículo pesado","text":"Al girar a la derecha con un camión largo, ¿qué debe anticipar el conductor?","options":["Que las ruedas traseras cortan la curva hacia el interior","Que el camión gira sobre su eje sin ocupar más espacio","Que no existen ángulos muertos","Que los vehículos pequeños deben apartarse siempre"],"correct":0,"explanation":"Las ruedas traseras pueden pasar más cerca del interior del giro y la carrocería puede barrer lateralmente; hay que comprobar el entorno.","wrong":"La geometría del vehículo exige anticipar la trayectoria y los ángulos muertos.","specific":false},{"id":"c005","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacerse antes de dar marcha atrás en una zona con visibilidad limitada?","options":["Retroceder rápido para terminar antes","Comprobar la zona, usar ayudas disponibles y pedir asistencia segura si es necesario","Confiar solo en el espejo derecho","Tocar el claxon y retroceder sin mirar"],"correct":1,"explanation":"La maniobra debe realizarse solo cuando el entorno esté comprobado y pueda controlarse; una persona que ayude debe situarse en lugar seguro y visible.","wrong":"El claxon o un solo espejo no garantizan que no haya peatones u obstáculos.","specific":false},{"id":"c006","area":"C","topic":"Vehículo pesado","text":"¿Qué puede ocurrir si un camión circula con una carga mal distribuida?","options":["Nada si la masa total no supera la MMA","Puede sobrecargar un eje y alterar la estabilidad y el frenado","Solo aumenta el ruido interior","El tacógrafo corrige automáticamente la distribución"],"correct":1,"explanation":"Además de la masa total, deben respetarse los límites por eje y la estabilidad del conjunto.","wrong":"El tacógrafo no controla la distribución de la carga.","specific":false},{"id":"c007","area":"C","topic":"Vehículo pesado","text":"¿Qué debe comprobarse respecto a la altura del vehículo y la carga antes de entrar en un paso inferior?","options":["Solo la anchura de la calzada","La altura total y el gálibo permitido, considerando la ruta y la señalización","Solo la altura de la cabina vacía","Nada si el navegador indica esa ruta"],"correct":1,"explanation":"La altura total del vehículo cargado debe ser compatible con el gálibo disponible; la planificación debe respetar las restricciones.","wrong":"El navegador no sustituye la señalización ni la comprobación de dimensiones.","specific":false},{"id":"c008","area":"C","topic":"Vehículo pesado","text":"¿Qué ventaja tiene elegir una marcha adecuada antes de un descenso largo?","options":["Permite bajar en punto muerto","Ayuda a controlar la velocidad y limita el calentamiento de los frenos","Elimina la necesidad de frenos","Reduce el peso del vehículo"],"correct":1,"explanation":"Una marcha adecuada y los sistemas de retención ayudan a mantener el control en pendientes.","wrong":"El punto muerto reduce el control y el frenado continuo puede provocar sobrecalentamiento.","specific":false},{"id":"c009","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacer si detecta una anomalía importante en el sistema de frenos?","options":["Continuar a velocidad baja hasta el destino","Detenerse de forma segura y no continuar hasta evaluar y resolver el defecto","Desactivar las advertencias","Aumentar la carga del eje delantero"],"correct":1,"explanation":"Los defectos de frenado pueden comprometer la capacidad de detener el vehículo y requieren actuación inmediata.","wrong":"Conducir despacio no elimina el riesgo de un fallo de frenos.","specific":false},{"id":"c010","area":"C","topic":"Vehículo pesado","text":"¿Qué función tienen los espejos y sistemas de visión indirecta?","options":["Eliminar todos los ángulos muertos","Ampliar la visión del entorno, aunque todavía pueden quedar zonas no visibles","Sustituir la observación directa cuando sea segura y necesaria","Medir la masa por eje"],"correct":1,"explanation":"Los espejos mejoran la visión, pero no eliminan todos los ángulos muertos; hay que comprobar el entorno antes de maniobrar.","wrong":"No debe asumirse que los espejos permiten ver absolutamente todo.","specific":false},{"id":"c011","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacerse con la presión de los neumáticos de un camión?","options":["Ajustarla a ojo sin consultar datos","Mantenerla según las especificaciones del fabricante y las condiciones de carga","Reducirla siempre para mejorar adherencia","Inflarlos por encima del máximo para ahorrar combustible"],"correct":1,"explanation":"La presión correcta depende de las especificaciones, la carga y el servicio; debe verificarse con medios adecuados.","wrong":"La presión excesiva o insuficiente puede empeorar seguridad, desgaste y consumo.","specific":false},{"id":"c012","area":"C","topic":"Vehículo pesado","text":"¿Por qué debe respetarse la masa máxima autorizada?","options":["Solo para evitar desgaste cosmético","Porque afecta a la legalidad, estabilidad, frenado y resistencia de componentes","Para que el tacógrafo funcione","Solo en carreteras de montaña"],"correct":1,"explanation":"El exceso de masa puede comprometer la seguridad y constituye un incumplimiento normativo.","wrong":"La MMA se aplica aunque el trayecto sea corto o la carretera llana.","specific":false},{"id":"c013","area":"C","topic":"Vehículo pesado","text":"¿Qué debe comprobarse tras acoplar un remolque?","options":["Solo que las luces interiores funcionen","El cierre y bloqueo del enganche, las conexiones y los dispositivos de seguridad aplicables","Solo la presión del asiento","Nada si el remolque está vacío"],"correct":1,"explanation":"El acoplamiento debe quedar bloqueado y las conexiones necesarias aseguradas antes de iniciar la marcha.","wrong":"Un remolque vacío también requiere un acoplamiento correcto.","specific":false},{"id":"c014","area":"C","topic":"Vehículo pesado","text":"¿Qué distancia de seguridad debe mantener un camión?","options":["Siempre la misma, sin importar velocidad","La suficiente para detenerse sin colisionar, adaptada a velocidad, masa, adherencia y tráfico","Menor que la de un turismo porque el camión es más visible","Ninguna en una pendiente"],"correct":1,"explanation":"La distancia debe permitir reaccionar y frenar con margen, y aumenta con la velocidad y condiciones desfavorables.","wrong":"La visibilidad del camión no compensa una distancia insuficiente.","specific":false},{"id":"c015","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacer si una señal indica una limitación de altura inferior a la altura total del camión?","options":["Entrar lentamente","No entrar y buscar una ruta compatible","Bajar la presión de los neumáticos para pasar","Confiar en que el techo sea flexible"],"correct":1,"explanation":"Debe respetarse el gálibo señalizado y planificarse una alternativa segura.","wrong":"Entrar puede causar un impacto grave y daños al vehículo o a la infraestructura.","specific":false},{"id":"c016","area":"C","topic":"Vehículo pesado","text":"¿Cuál es una comprobación razonable antes de iniciar un servicio?","options":["Solo que haya combustible","Luces, neumáticos, frenos, fugas visibles, espejos, documentación y sujeción de la carga","Solo la radio y el aire acondicionado","Únicamente que el motor arranque"],"correct":1,"explanation":"La comprobación previa debe abarcar los elementos críticos de seguridad y la carga, conforme al procedimiento aplicable.","wrong":"Que el motor arranque no garantiza que el vehículo esté en condiciones seguras.","specific":false},{"id":"c017","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacer si el vehículo comienza a perder estabilidad en una curva?","options":["Girar bruscamente en sentido contrario","Evitar maniobras bruscas, reducir suavemente si es posible y mantener el control","Frenar a fondo inmediatamente en cualquier situación","Acelerar al máximo"],"correct":1,"explanation":"Las maniobras bruscas pueden agravar la pérdida de estabilidad; la respuesta debe ser suave y adaptada a la situación.","wrong":"Una reacción violenta puede provocar un vuelco o pérdida de control.","specific":false},{"id":"c018","area":"C","topic":"Vehículo pesado","text":"¿Qué precaución es importante al acercarse a una rotonda con un camión largo?","options":["Entrar sin comprobar para no frenar el tráfico","Adaptar velocidad, seleccionar el carril adecuado y anticipar el espacio que necesita el vehículo","Circular por encima de la isleta si hay tráfico","Cambiar de carril en mitad de la rotonda sin observar"],"correct":1,"explanation":"La longitud y trayectoria del camión exigen planificar la entrada, el carril y la salida, sin invadir espacios de otros usuarios.","wrong":"La maniobra requiere anticipación y respeto a los demás usuarios.","specific":false},{"id":"c019","area":"C","topic":"Vehículo pesado","text":"¿Qué efecto puede tener una carga que se desplaza durante una frenada?","options":["Mejorar la adherencia","Alterar el equilibrio del vehículo y aumentar el riesgo de pérdida de control","Reducir la distancia de detención","Ninguno si las puertas están cerradas"],"correct":1,"explanation":"Una carga desplazada puede modificar el centro de gravedad, dañar el vehículo y desestabilizarlo.","wrong":"Las puertas cerradas no sustituyen una sujeción adecuada.","specific":false},{"id":"c020","area":"C","topic":"Vehículo pesado","text":"¿Qué debe hacer si no puede comprobar con seguridad que el área de maniobra está despejada?","options":["Maniobrar despacio sin más comprobaciones","Detener la maniobra y obtener visibilidad o asistencia segura antes de continuar","Pitar una vez y asumir que está libre","Pedir a peatones que pasen detrás del camión"],"correct":1,"explanation":"Si no se puede verificar el entorno, la maniobra debe detenerse hasta disponer de condiciones seguras.","wrong":"Avanzar a ciegas sigue siendo peligroso aunque se circule despacio.","specific":false},{"id":"cap101","area":"CAP","topic":"Seguridad vial","text":"¿Qué debe hacer el conductor si una maniobra exige invadir parte del espacio de otro carril?","options":["Realizarla sin señalizar","Comprobar el entorno, señalizar con antelación y efectuarla solo si es segura y está permitida","Confiar en que los demás se aparten","Acelerar para reducir el tiempo de invasión"],"correct":1,"explanation":"Las maniobras deben planificarse, señalizarse y realizarse solo cuando no creen peligro y estén permitidas.","wrong":"La señalización no otorga prioridad automática ni elimina la obligación de comprobar que la maniobra es segura.","specific":false},{"id":"cap102","area":"CAP","topic":"Carga y estiba","text":"¿Por qué hay que considerar las fuerzas laterales al sujetar la carga?","options":["Porque solo actúan al frenar","Porque en las curvas la carga puede desplazarse hacia un lado","Porque eliminan la necesidad de anclajes","Porque afectan únicamente a mercancía líquida"],"correct":1,"explanation":"En curvas y maniobras laterales, la carga tiende a desplazarse; la sujeción debe considerar las fuerzas previsibles en distintas direcciones.","wrong":"La carga puede moverse no solo al frenar, sino también al acelerar y girar.","specific":false},{"id":"cap103","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué puede ocurrir si los frenos se sobrecalientan en un descenso prolongado?","options":["Aumenta siempre la eficacia de frenado","Puede disminuir la eficacia de frenado","Se corrige automáticamente al pisar más fuerte","No afecta a un vehículo pesado"],"correct":1,"explanation":"El calentamiento excesivo puede reducir la eficacia de los frenos; por eso se usan marchas y sistemas de retención adecuados.","wrong":"Aplicar más fuerza no elimina el calentamiento y puede empeorar la situación.","specific":false},{"id":"cap104","area":"CAP","topic":"Tiempos y tacógrafo","text":"¿Qué debe hacer el conductor si detecta que su tarjeta de tacógrafo no funciona correctamente?","options":["Compartir la tarjeta con otro conductor","Seguir el procedimiento reglamentario para registrar las actividades y resolver la incidencia","Desconectar el tacógrafo","Borrar el registro del día"],"correct":1,"explanation":"Las averías de tarjeta o aparato deben gestionarse conforme al procedimiento aplicable, manteniendo registros fiables de la actividad.","wrong":"Compartir la tarjeta o borrar registros impide identificar correctamente al conductor y sus actividades.","specific":false},{"id":"cap105","area":"CAP","topic":"Documentación y normativa","text":"¿Qué debe comprobarse al recoger una mercancía?","options":["Solo el color del embalaje","La correspondencia entre mercancía, cantidades, estado visible y documentos relevantes","Que el destinatario todavía no haya llamado","Únicamente la hora prevista de llegada"],"correct":1,"explanation":"La comprobación inicial permite detectar diferencias y daños visibles antes de que la mercancía continúe en tránsito.","wrong":"La hora de llegada no sustituye la comprobación de la mercancía y sus documentos.","specific":false},{"id":"cap106","area":"CAP","topic":"Conducción eficiente","text":"¿Qué relación hay entre anticipación y consumo?","options":["Anticipar obliga a frenar más","Anticipar permite reducir aceleraciones y frenadas bruscas","No hay relación","Solo afecta a vehículos eléctricos"],"correct":1,"explanation":"La anticipación permite mantener una conducción más fluida y reducir el uso innecesario de combustible y frenos.","wrong":"La conducción fluida y anticipada suele evitar maniobras innecesarias.","specific":false},{"id":"cap107","area":"CAP","topic":"Salud y emergencias","text":"¿Qué debe hacer un conductor antes de tomar un medicamento nuevo si va a conducir profesionalmente?","options":["Suponer que todos son seguros","Comprobar el prospecto y consultar a un profesional sanitario si puede afectar a la conducción","Duplicar la dosis para acostumbrarse","Tomarlo únicamente durante la marcha"],"correct":1,"explanation":"Algunos medicamentos afectan a la atención o producen somnolencia; conviene comprobar advertencias y consultar si hay dudas.","wrong":"No se debe asumir que un medicamento carece de efectos sobre la conducción.","specific":false},{"id":"cap108","area":"CAP","topic":"Servicio profesional","text":"¿Qué debe hacerse si el horario de entrega previsto obliga a incumplir un descanso obligatorio?","options":["Incumplirlo para satisfacer al cliente","Replanificar y comunicar la incidencia para respetar la normativa y la seguridad","Alterar el tacógrafo","Conducir más rápido para recuperar tiempo"],"correct":1,"explanation":"Los plazos comerciales deben planificarse de forma compatible con los descansos obligatorios y la seguridad vial.","wrong":"No es aceptable manipular registros o conducir de forma peligrosa para cumplir un horario.","specific":false},{"id":"cap109","area":"CAP","topic":"Seguridad vial","text":"¿Por qué es importante mantener una distancia lateral adecuada al adelantar a usuarios vulnerables?","options":["Para que el camión pase más cerca","Para reducir el riesgo por tamaño, corrientes de aire y posibles movimientos del usuario","Solo para evitar daños en los espejos","No es importante si se toca el claxon"],"correct":1,"explanation":"Los usuarios vulnerables pueden verse afectados por el tamaño y el desplazamiento de aire del vehículo; la maniobra requiere espacio y prudencia.","wrong":"El claxon no sustituye la distancia lateral y una maniobra segura.","specific":false},{"id":"cap110","area":"CAP","topic":"Mecánica y mantenimiento","text":"¿Qué debe hacer si una advertencia de temperatura del motor aparece junto con síntomas de sobrecalentamiento?","options":["Abrir de inmediato el tapón del circuito caliente","Detenerse en un lugar seguro y seguir las instrucciones del fabricante, evitando abrir el circuito caliente","Verter agua fría sobre el motor sin comprobar","Continuar hasta que se apague el testigo"],"correct":1,"explanation":"El sobrecalentamiento puede causar daños y abrir un circuito caliente puede provocar quemaduras; hay que detenerse y seguir el procedimiento seguro.","wrong":"Abrir el circuito en caliente puede liberar vapor y líquido a presión.","specific":false}];
+const CCAP_LESSONS = [{"title":"01. Permiso C y CAP","tag":"Fundamentos","intro":"El permiso habilita a conducir una categoría; el CAP acredita la cualificación profesional cuando es exigible.","key":"Comprueba siempre qué permiso, cualificación y documentos necesita la operación concreta.","sections":[["Diferencias esenciales",["El permiso C habilita, dentro de sus límites, para conducir determinados camiones.","El CAP es una cualificación profesional distinta del permiso de conducción.","Las obligaciones y exenciones dependen del vehículo, la actividad y la normativa aplicable."]],["Antes de salir",["Comprueba vigencia, categoría y restricciones del permiso.","Verifica la cualificación CAP cuando sea obligatoria y la documentación del servicio.","No confundas permiso, tarjeta CAP, documentación del vehículo y documentos de la mercancía."]]]},{"title":"02. Seguridad vial y maniobras","tag":"Seguridad","intro":"La masa y las dimensiones de un camión exigen anticipación, visibilidad y espacio.","key":"Adapta velocidad y distancia a la carga, adherencia, visibilidad, pendiente y tráfico.","sections":[["Anticipación",["La distancia de detención incluye reacción y frenado.","Los ángulos muertos pueden ocultar peatones, ciclistas y vehículos, incluso con espejos bien ajustados.","Las ruedas traseras de un vehículo largo pueden seguir una trayectoria más cerrada que las delanteras."]],["Condiciones difíciles",["Con viento lateral, lluvia o hielo, reduce la velocidad si procede y evita maniobras bruscas.","El ABS ayuda a evitar el bloqueo de ruedas, pero no elimina los límites de adherencia.","En pendientes largas, selecciona antes una marcha adecuada y utiliza los sistemas de retención previstos."]]]},{"title":"03. Masas, carga y estiba","tag":"Carga","intro":"Una carga segura debe estar bien distribuida, inmovilizada y dentro de todos los límites aplicables.","key":"Respeta MMA y masas por eje; sujeta la carga para evitar desplazamientos durante frenadas y giros.","sections":[["Distribución",["La MMA incluye el vehículo y la carga dentro de los límites autorizados.","Una masa total correcta no garantiza que cada eje esté dentro de su límite.","Un centro de gravedad alto o desplazado puede empeorar la estabilidad."]],["Sujeción",["Utiliza amarres y anclajes adecuados, en buen estado y compatibles con la carga.","Comprueba cierres, amarres y estabilidad antes de salir y durante las comprobaciones previstas.","La carga no debe ocultar luces, matrícula ni señalización obligatoria."]]]},{"title":"04. Tiempos de conducción y tacógrafo","tag":"Normativa","intro":"Los límites de conducción, las pausas y los descansos se deben planificar antes de iniciar el servicio.","key":"Reglas generales: 4,5 h de conducción → pausa de 45 min; 9 h diarias (10 h como máximo dos veces por semana), 56 h semanales y 90 h en dos semanas.","sections":[["Límites y pausas",["La pausa general tras 4,5 horas es de 45 minutos ininterrumpidos.","Puede fraccionarse en 15 minutos seguidos de 30, conforme a la regla general.","La conducción diaria es de 9 horas, ampliable a 10 como máximo dos veces por semana; semanal 56 horas y bisemanal 90 horas."]],["Descansos y registros",["El descanso diario regular es de al menos 11 horas; hay modalidades reducidas o fraccionadas bajo condiciones.","El descanso semanal regular es de al menos 45 horas; las reducciones están sujetas a reglas y compensación.","Registra fielmente conducción, otros trabajos, disponibilidad y descansos según corresponda."]],["Aviso",["Existen excepciones y supuestos especiales. Consulta el Reglamento (CE) 561/2006 vigente y las instrucciones aplicables al servicio."]]]},{"title":"05. Mecánica y mantenimiento","tag":"Vehículo","intro":"Las comprobaciones preventivas permiten detectar defectos antes de que se conviertan en averías peligrosas.","key":"Si detectas un defecto que compromete la seguridad, detente en un lugar seguro y no continúes hasta resolverlo.","sections":[["Comprobaciones",["Revisa neumáticos, luces, frenos, fugas visibles, espejos y avisos del vehículo.","Comprueba acoplamientos y conexiones cuando lleves remolque.","Respeta las especificaciones del fabricante para presiones, niveles y mantenimiento."]],["Frenado",["Los ralentizadores ayudan a controlar la velocidad en descensos y reducen el uso continuo de los frenos de servicio.","No bajes pendientes largas en punto muerto ni con el embrague pisado.","El ABS ayuda a evitar el bloqueo, pero no garantiza una distancia menor en todas las superficies."]]]},{"title":"06. Documentación y actividad de transporte","tag":"Operativa","intro":"La documentación depende del tipo de transporte, la mercancía, el territorio y las autorizaciones exigibles.","key":"Los documentos deben corresponder al servicio real; no alteres ni ignores discrepancias.","sections":[["Documentación",["La carta de porte CMR documenta determinados transportes internacionales por carretera sujetos al Convenio CMR.","Pueden exigirse autorizaciones, albaranes, documentos aduaneros y documentos específicos de mercancías.","El cabotaje y otras operaciones están sujetos a condiciones legales propias."]],["Incidencias",["Registra de forma objetiva daños, diferencias, rechazos y reservas.","Aclara discrepancias relevantes antes de continuar cuando afecten a la seguridad o legalidad.","Mantén los documentos disponibles y protege los datos de clientes y destinatarios."]]]},{"title":"07. Salud, fatiga y primeros auxilios","tag":"Conductor","intro":"La aptitud del conductor es parte esencial de la seguridad del transporte.","key":"Si aparece somnolencia o una sustancia afecta a la conducción, detente con seguridad y actúa.","sections":[["Fatiga y ergonomía",["Las señales de fatiga incluyen bostezos, dificultad de concentración y reacciones lentas.","Ajusta asiento, volante y espejos con el vehículo detenido.","Consulta si un medicamento puede afectar a la conducción."]],["Emergencias",["PAS significa Proteger, Avisar y Socorrer.","No te conviertas en una segunda víctima: evalúa los riesgos antes de intervenir.","Sigue las indicaciones de los servicios de emergencia y actúa dentro de tus conocimientos."]]]},{"title":"08. Conducción eficiente y medioambiente","tag":"Eficiencia","intro":"La conducción eficiente combina seguridad, anticipación, mantenimiento y planificación.","key":"La anticipación reduce aceleraciones y frenadas innecesarias, consumo, emisiones y desgaste.","sections":[["Conducción",["Acelera progresivamente y anticipa el tráfico.","Evita el ralentí innecesario cuando sea posible y seguro.","Mantén la presión de neumáticos dentro de las especificaciones."]],["Planificación",["Planifica rutas aptas para dimensiones y masas del vehículo.","La eficiencia no justifica incumplir descansos ni circular de forma insegura.","El mantenimiento preventivo ayuda a mantener el vehículo en condiciones eficientes."]]]},{"title":"09. Mercancías peligrosas","tag":"Especialidad CAP","intro":"Las mercancías peligrosas requieren identificar la materia y cumplir las condiciones específicas de transporte.","key":"No improvises ante una fuga o incidente: evita la exposición, protege la zona y sigue el procedimiento aplicable.","sections":[["ADR",["El ADR regula el transporte por carretera de mercancías peligrosas dentro de su ámbito.","Según el caso pueden exigirse clasificación, embalaje, marcas, etiquetas, documentación, equipos y formación.","Las instrucciones escritas deben estar accesibles cuando sean exigibles."]],["Incidentes",["Evita tocar sustancias desconocidas o dispersarlas hacia desagües.","Aleja a las personas y avisa a los servicios competentes siguiendo el procedimiento.","Los requisitos dependen de la materia, cantidad y condiciones de transporte."]]]},{"title":"10. Carga especializada y sujeción","tag":"Especialidad CAP","intro":"La carga debe permanecer estable durante aceleraciones, frenadas y curvas.","key":"Usa amarres adecuados, revisa su estado y no continúes con sistemas de sujeción dañados.","sections":[["Sujeción",["Las cinchas y anclajes deben tener capacidad adecuada para la carga y estar en buen estado.","Los cierres de cajas y contenedores deben quedar asegurados.","La mercancía frágil requiere protección, estabilidad y conducción suave."]],["Comprobación",["Una carga desplazada puede alterar el centro de gravedad y la distribución por eje.","Comprueba los amarres antes de salir y según el procedimiento durante el servicio.","Nunca improvises reparaciones de equipos de sujeción dañados."]]]},{"title":"11. Temperatura controlada","tag":"Especialidad CAP","intro":"Los productos sensibles necesitan condiciones térmicas adecuadas y gestión de incidencias.","key":"Respeta la consigna específica del producto y registra cualquier desviación relevante.","sections":[["Antes y durante el viaje",["Comprueba el equipo y la consigna antes de cargar.","Limita las aperturas de puertas para reducir intercambios térmicos.","Sigue las instrucciones específicas de cada mercancía: no existe una única temperatura para todos los productos."]],["Higiene y trazabilidad",["Mantén limpieza y separación de productos incompatibles.","Registra y comunica las desviaciones conforme al procedimiento.","La temperatura correcta no sustituye las medidas de higiene."]]]},{"title":"12. Animales vivos y bienestar","tag":"Especialidad CAP","intro":"El transporte de animales exige atender a su bienestar y a las condiciones del vehículo y del trayecto.","key":"Prioriza espacio, ventilación, manejo y condiciones de transporte acordes con la especie y la normativa.","sections":[["Preparación",["Comprueba la aptitud del vehículo, ventilación, espacio y elementos de separación requeridos.","Evita densidades inadecuadas y manipulaciones bruscas.","Planifica el viaje conforme a los requisitos de bienestar aplicables."]],["Incidencias",["Atiende los signos de sufrimiento según el procedimiento y solicita ayuda competente cuando proceda.","La limpieza y desinfección adecuadas ayudan a reducir contaminación y transmisión de enfermedades.","No administres medicamentos sin autorización adecuada."]]]}];
+const CCAP_SOURCES = [{"title":"Real Decreto 284/2021 — CAP (BOE, texto consolidado)","url":"https://www.boe.es/buscar/act.php?id=BOE-A-2021-6624","description":"Marco estatal de cualificación inicial y formación continua; incluye formato general del examen CAP."},{"title":"Reglamento (CE) 561/2006 — tiempos de conducción","url":"https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02006R0561-20241231","description":"Normativa europea sobre límites generales, pausas y descansos."},{"title":"Modelos de cuestionarios CAP — Generalitat de Catalunya","url":"https://territori.gencat.cat/ca/03_infraestructures_i_mobilitat/activitats_i_professionals_del_transport/competencia_professional_i_formacio/certificat_aptitud_conductors_professionals/models-questionaris-proves-CAP/","description":"Índice de modelos y cuestionarios oficiales CAP publicados por convocatorias."},{"title":"Permisos de conducción — DGT","url":"https://www.dgt.es/nuestros-servicios/permisos-de-conducir/obtener-un-nuevo-permiso-de-conducir/requisitos-preparacion-y-presentacion-a-examen/","description":"Información oficial de la DGT sobre preparación y obtención de permisos."},{"title":"CAP — Ministerio de Transportes","url":"https://www.transportes.gob.es/transporte-terrestre/examenes-y-formacion/examenes-de-formacion-de-conductores-profesionales-cap","description":"Información institucional sobre formación y exámenes de conductores profesionales."},{"title":"Reglamento General de Conductores — BOE","url":"https://www.boe.es/buscar/act.php?id=BOE-A-2009-9481","description":"Normativa sobre las pruebas de conocimientos comunes y específicos para los permisos de conducción."}];
+const CCAP_TOPIC_ORDER = [...new Set(CCAP_BANK.map(q => q.topic))];
+const CCAP_LETTERS = ["A", "B", "C", "D"];
+const CCAP_LESSON_TOPIC = [
+  "Documentación y normativa", "Seguridad vial", "Carga y estiba",
+  "Tiempos y tacógrafo", "Mecánica y mantenimiento", "Documentación y normativa",
+  "Salud y emergencias", "Conducción eficiente", "Mercancías peligrosas",
+  "Carga especializada", "Temperatura controlada", "Animales vivos"
+];
+
+let ccapPractice = null;
+let ccapExam = null;
+let ccapTimer = null;
+let ccapPracticeArea = "all";
+let ccapPracticeTopic = "all";
+
+function ccapEnsureProgress() {
+  if (!appState.progress || typeof appState.progress !== "object") appState.progress = {};
+  const defaults = {
+    totalAnswered: 0, totalCorrect: 0, totalWrong: 0,
+    pendingQuestionIds: [], masteredQuestionIds: [],
+    mistakesByQuestion: {}, topicStats: {}, examHistory: [], completedExams: 0
+  };
+  appState.progress = { ...defaults, ...appState.progress };
+  if (!Array.isArray(appState.progress.pendingQuestionIds)) appState.progress.pendingQuestionIds = [];
+  if (!Array.isArray(appState.progress.masteredQuestionIds)) appState.progress.masteredQuestionIds = [];
+  if (!appState.progress.mistakesByQuestion || typeof appState.progress.mistakesByQuestion !== "object") appState.progress.mistakesByQuestion = {};
+  if (!appState.progress.topicStats || typeof appState.progress.topicStats !== "object") appState.progress.topicStats = {};
+  if (!Array.isArray(appState.progress.examHistory)) appState.progress.examHistory = [];
+  return appState.progress;
+}
+
+function ccapShuffle(items) {
+  const result = items.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function ccapEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function ccapGetTopicStats(topic) {
+  const p = ccapEnsureProgress();
+  const key = "topic:" + topic;
+  if (!p.topicStats[key]) p.topicStats[key] = { answered: 0, correct: 0, wrong: 0 };
+  return p.topicStats[key];
+}
+
+function ccapTopicAccuracy(topic) {
+  const s = ccapGetTopicStats(topic);
+  return s.answered ? Math.round(s.correct / s.answered * 100) : 0;
+}
+
+function ccapTopicUnlocked(topic) {
+  const index = CCAP_TOPIC_ORDER.indexOf(topic);
+  if (index <= 0) return true;
+  const previous = ccapGetTopicStats(CCAP_TOPIC_ORDER[index - 1]);
+  return previous.answered >= 5 && previous.correct / previous.answered >= 0.7;
+}
+
+function ccapRecordResponse(question, isCorrect, persist = true) {
+  const p = ccapEnsureProgress();
+  p.totalAnswered = (Number(p.totalAnswered) || 0) + 1;
+  const areaKey = question.area === "C" ? "permiso_c" : "cap_mercancias";
+  for (const key of [areaKey, "topic:" + question.topic]) {
+    if (!p.topicStats[key]) p.topicStats[key] = { answered: 0, correct: 0, wrong: 0 };
+    p.topicStats[key].answered++;
+    if (isCorrect) p.topicStats[key].correct++;
+    else p.topicStats[key].wrong++;
+  }
+
+  const pending = new Set(p.pendingQuestionIds);
+  const mastered = new Set(p.masteredQuestionIds);
+  if (isCorrect) {
+    p.totalCorrect = (Number(p.totalCorrect) || 0) + 1;
+    pending.delete(question.id);
+    mastered.add(question.id);
+  } else {
+    p.totalWrong = (Number(p.totalWrong) || 0) + 1;
+    pending.add(question.id);
+    mastered.delete(question.id);
+    p.mistakesByQuestion[question.id] = (Number(p.mistakesByQuestion[question.id]) || 0) + 1;
+  }
+  p.pendingQuestionIds = [...pending];
+  p.masteredQuestionIds = [...mastered];
+  if (persist) {
+    saveState();
+    updateDashboard();
+  }
+}
+
+function ccapRenderLectiva() {
+  const view = document.getElementById("view-lectiva");
+  view.innerHTML = `
+    <div class="section-heading">
+      <div><h2>Parte lectiva · Temario</h2><p>Estudia cada bloque y pasa a la práctica para consolidar lo aprendido.</p></div>
+      <span class="tag">${CCAP_LESSONS.length} bloques de estudio</span>
+    </div>
+    <div class="grid-2">
+      ${CCAP_LESSONS.map((lesson, index) => `
+        <details class="card" ${index === 0 ? "open" : ""} style="padding:0;overflow:hidden">
+          <summary style="cursor:pointer;list-style:none;display:flex;gap:12px;padding:16px">
+            <span class="feature-icon" style="flex:0 0 39px;margin:0">${String(index + 1).padStart(2,"0")}</span>
+            <span style="min-width:0"><span class="tag">${ccapEscape(lesson.tag)}</span><strong style="display:block;margin:7px 0 4px">${ccapEscape(lesson.title)}</strong><span class="muted" style="font-size:12px">${ccapEscape(lesson.intro)}</span></span>
+          </summary>
+          <div style="padding:0 17px 17px">
+            <div class="notice"><strong>Idea clave:</strong> ${ccapEscape(lesson.key)}</div>
+            ${lesson.sections.map(section => `
+              <h4 style="font-size:14px;margin:15px 0 6px">${ccapEscape(section[0])}</h4>
+              <ul style="padding-left:20px;margin-top:0">${section[1].map(line => `<li style="font-size:13px;color:var(--muted);margin:6px 0">${ccapEscape(line)}</li>`).join("")}</ul>
+            `).join("")}
+            <div class="row-actions">
+              <button class="button primary" type="button" data-lesson-practice="${index}">Practicar este bloque →</button>
+              <span class="tag">Maestría ${ccapTopicAccuracy(CCAP_LESSON_TOPIC[index])}%</span>
+            </div>
+          </div>
+        </details>
+      `).join("")}
+    </div>
+    <div class="section-heading"><div><h2>Fuentes oficiales y normativa</h2><p>Consulta la norma vigente y los modelos de cuestionario de tu convocatoria.</p></div></div>
+    <div class="source-list">
+      ${CCAP_SOURCES.map(source => `
+        <a class="source-link" href="${ccapEscape(source.url)}" target="_blank" rel="noopener noreferrer">
+          <span class="feature-icon" style="flex:0 0 35px;width:35px;height:35px;margin:0">↗</span>
+          <span><strong>${ccapEscape(source.title)}</strong><small>${ccapEscape(source.description)}</small></span>
+        </a>
+      `).join("")}
+    </div>
+    <div class="notice"><strong>Importante:</strong> las preguntas integradas son originales y didácticas, no una copia literal del banco oficial. Los requisitos y excepciones pueden cambiar: verifica siempre la convocatoria y la normativa vigente.</div>
+  `;
+  view.querySelectorAll("[data-lesson-practice]").forEach(button => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.lessonPractice);
+      const topic = CCAP_LESSON_TOPIC[index] || "all";
+      ccapPracticeArea = "all";
+      ccapPracticeTopic = topic;
+      showTab("interactiva");
+      ccapRenderInteractive();
+      ccapStartPractice(false, ccapPracticeTopic);
+    });
+  });
+}
+
+function ccapRenderInteractive() {
+  const view = document.getElementById("view-interactiva");
+  const p = ccapEnsureProgress();
+  const topicOptions = CCAP_TOPIC_ORDER.map((topic, index) => {
+    const locked = !ccapTopicUnlocked(topic);
+    return `<option value="${ccapEscape(topic)}" ${ccapPracticeTopic === topic ? "selected" : ""} ${locked ? "disabled" : ""}>${index + 1}. ${ccapEscape(topic)}${locked ? " · 🔒" : ""}</option>`;
+  }).join("");
+  view.innerHTML = `
+    <div class="section-heading">
+      <div><h2>Parte interactiva · Aprende practicando</h2><p>Feedback inmediato, explicación de cada respuesta y refuerzo automático de errores.</p></div>
+      <span class="tag">Banco: ${CCAP_BANK.length} preguntas</span>
+    </div>
+    <div class="card">
+      <div class="grid-3">
+        <div class="field"><label for="ccapArea">Área</label><select id="ccapArea">
+          <option value="all" ${ccapPracticeArea === "all" ? "selected" : ""}>Todo el banco</option>
+          <option value="CAP" ${ccapPracticeArea === "CAP" ? "selected" : ""}>CAP mercancías</option>
+          <option value="C" ${ccapPracticeArea === "C" ? "selected" : ""}>Permiso C</option>
+        </select></div>
+        <div class="field"><label for="ccapTopic">Bloque / nivel</label><select id="ccapTopic">
+          <option value="all" ${ccapPracticeTopic === "all" ? "selected" : ""}>Repaso global</option>${topicOptions}
+        </select></div>
+        <div class="field"><label for="ccapSize">Preguntas por sesión</label><select id="ccapSize">
+          <option value="10">10 preguntas</option><option value="15" selected>15 preguntas</option><option value="20">20 preguntas</option><option value="30">30 preguntas</option>
+        </select></div>
+      </div>
+      <div class="row-actions">
+        <button class="button primary" id="ccapStartPractice" type="button">▶ Generar test nuevo</button>
+        <button class="button" id="ccapOnlyMistakes" type="button">↻ Solo falladas (${p.pendingQuestionIds.length})</button>
+      </div>
+      <div class="notice">Las preguntas falladas pasan a la cola de refuerzo y se priorizan en las siguientes sesiones. Una respuesta correcta las retira de la cola; si vuelves a fallarlas, entran de nuevo.</div>
+    </div>
+    <div class="section-heading"><div><h2>Mapa de niveles</h2><p>Para desbloquear el siguiente nivel, consigue al menos 5 respuestas y un 70% de acierto en el bloque anterior. El repaso global siempre está disponible.</p></div></div>
+    <div class="grid-3">
+      ${CCAP_TOPIC_ORDER.map((topic, index) => {
+        const s = ccapGetTopicStats(topic);
+        const unlocked = ccapTopicUnlocked(topic);
+        return `<button class="card" type="button" data-level-topic="${ccapEscape(topic)}" ${unlocked ? "" : "disabled"} style="text-align:left;opacity:${unlocked ? "1" : ".52"};cursor:${unlocked ? "pointer" : "not-allowed"}">
+          <span class="tag">Nivel ${index + 1}${unlocked ? "" : " · 🔒"}</span>
+          <strong style="display:block;margin:9px 0 4px;font-size:13px">${ccapEscape(topic)}</strong>
+          <span class="muted" style="font-size:11px">${s.answered} respuestas · ${ccapTopicAccuracy(topic)}% de acierto</span>
+          <div class="progress-track" style="margin-top:9px"><span style="width:${ccapTopicAccuracy(topic)}%"></span></div>
+        </button>`;
+      }).join("")}
+    </div>
+    <div id="ccapPracticeArea" style="margin-top:16px"></div>
+  `;
+  document.getElementById("ccapArea").addEventListener("change", e => { ccapPracticeArea = e.target.value; });
+  document.getElementById("ccapTopic").addEventListener("change", e => { ccapPracticeTopic = e.target.value; });
+  document.getElementById("ccapStartPractice").addEventListener("click", () => ccapStartPractice(false));
+  document.getElementById("ccapOnlyMistakes").addEventListener("click", () => ccapStartPractice(true));
+  view.querySelectorAll("[data-level-topic]").forEach(button => button.addEventListener("click", () => {
+    ccapPracticeTopic = button.dataset.levelTopic;
+    ccapRenderInteractive();
+    ccapStartPractice(false, ccapPracticeTopic);
+  }));
+  if (ccapPractice) ccapRenderPracticeQuestion();
+}
+
+function ccapStartPractice(onlyMistakes = false, forcedTopic = null) {
+  const areaEl = document.getElementById("ccapArea");
+  const topicEl = document.getElementById("ccapTopic");
+  const sizeEl = document.getElementById("ccapSize");
+  if (areaEl) ccapPracticeArea = areaEl.value;
+  if (topicEl && !forcedTopic) ccapPracticeTopic = topicEl.value;
+  if (forcedTopic) ccapPracticeTopic = forcedTopic;
+
+  const p = ccapEnsureProgress();
+  let pool = CCAP_BANK.filter(q =>
+    (ccapPracticeArea === "all" || q.area === ccapPracticeArea) &&
+    (ccapPracticeTopic === "all" || q.topic === ccapPracticeTopic)
+  );
+  if (onlyMistakes) pool = pool.filter(q => p.pendingQuestionIds.includes(q.id));
+  const area = document.getElementById("ccapPracticeArea");
+
+  if (!pool.length) {
+    ccapPractice = null;
+    if (area) area.innerHTML = `<div class="card placeholder"><div class="placeholder-icon">🎉</div><h3>No hay preguntas pendientes en esta selección</h3><p>Prueba otro bloque o genera un test de repaso global.</p></div>`;
+    return;
+  }
+
+  const size = Number(sizeEl?.value || 15);
+  const pendingIds = new Set(p.pendingQuestionIds);
+  const pending = pool.filter(q => pendingIds.has(q.id))
+    .sort((a, b) => (p.mistakesByQuestion[b.id] || 0) - (p.mistakesByQuestion[a.id] || 0));
+  const newQuestions = ccapShuffle(pool.filter(q => !pendingIds.has(q.id)));
+  let ordered = [...pending, ...newQuestions];
+  if (onlyMistakes) ordered = pending;
+  ordered = ordered.slice(0, Math.min(size, ordered.length));
+
+  ccapPractice = { questions: ordered, index: 0, answered: false, selected: null, correct: 0, wrong: 0, done: false };
+  ccapRenderPracticeQuestion();
+}
+
+function ccapRenderPracticeQuestion() {
+  const area = document.getElementById("ccapPracticeArea");
+  if (!area || !ccapPractice) return;
+  const session = ccapPractice;
+  if (session.done || session.index >= session.questions.length) {
+    session.done = true;
+    const total = session.correct + session.wrong;
+    area.innerHTML = `<div class="card" style="text-align:center">
+      <div class="eyebrow">Sesión completada</div><h2>¡Buen trabajo! 🏁</h2>
+      <div class="grid-3" style="margin:15px 0">
+        <div class="stat"><span class="stat-label">Correctas</span><strong class="stat-value">${session.correct}</strong></div>
+        <div class="stat"><span class="stat-label">Fallos</span><strong class="stat-value">${session.wrong}</strong></div>
+        <div class="stat"><span class="stat-label">Acierto</span><strong class="stat-value">${total ? Math.round(session.correct / total * 100) : 0}%</strong></div>
+      </div>
+      <p class="muted">Los fallos quedan guardados y se priorizarán en los siguientes tests.</p>
+      <div class="row-actions" style="justify-content:center"><button class="button primary" id="ccapAgain">Generar otro test</button><button class="button" id="ccapProgress">Ver progreso</button></div>
+    </div>`;
+    document.getElementById("ccapAgain").addEventListener("click", () => ccapStartPractice(false));
+    document.getElementById("ccapProgress").addEventListener("click", () => showTab("progreso"));
+    return;
+  }
+
+  const q = session.questions[session.index];
+  const correct = q.correct;
+  area.innerHTML = `<div class="grid-2" style="align-items:start">
+    <article class="card">
+      <div class="row-actions"><span class="tag">${q.area === "CAP" ? "CAP mercancías" : "Permiso C"}</span><span class="tag">${ccapEscape(q.topic)}</span>${q.specific ? '<span class="tag">Específica mercancías</span>' : ""}<span class="tag" style="margin-left:auto">${session.index + 1} / ${session.questions.length}</span></div>
+      <h3 style="font-size:clamp(18px,2.5vw,23px);line-height:1.35;margin:17px 0">${ccapEscape(q.text)}</h3>
+      <div style="display:grid;gap:9px">
+        ${q.options.map((option, index) => {
+          let cls = "button";
+          if (session.answered && index === correct) cls += " ccap-correct";
+          if (session.answered && index === session.selected && index !== correct) cls += " ccap-wrong";
+          return `<button type="button" class="ccap-choice ${cls}" data-answer="${index}" ${session.answered ? "disabled" : ""}>
+            <span class="ccap-letter">${CCAP_LETTERS[index]}</span><span>${ccapEscape(option)}</span>
+          </button>`;
+        }).join("")}
+      </div>
+      ${session.answered ? `<div class="notice" style="background:${session.selected === correct ? "var(--good-bg, #dcfce7)" : "var(--warning-bg)"};margin-top:14px">
+        <strong>${session.selected === correct ? "✓ Respuesta correcta" : "✕ Respuesta incorrecta"}</strong>
+        <p style="margin:6px 0 0"><strong>Respuesta correcta:</strong> ${CCAP_LETTERS[correct]}. ${ccapEscape(q.options[correct])}</p>
+        <p style="margin:6px 0 0">${ccapEscape(q.explanation)}</p>
+        ${session.selected !== correct ? `<p style="margin:6px 0 0"><strong>Por qué falla tu opción:</strong> ${ccapEscape(q.wrong)}</p>` : ""}
+      </div>` : ""}
+      <div class="row-actions" style="justify-content:space-between;margin-top:15px">
+        <span class="muted" style="font-size:12px">Aciertos: ${session.correct} · Fallos: ${session.wrong}</span>
+        ${session.answered ? `<button class="button primary" id="ccapNext">${session.index === session.questions.length - 1 ? "Terminar sesión" : "Siguiente →"}</button>` : '<span class="tag">Elige una respuesta</span>'}
+      </div>
+    </article>
+    <aside class="card">
+      <h3 style="font-size:15px">Tu sesión</h3>
+      <div class="topic-row"><div><strong>Respondidas</strong></div><div class="muted">${session.index + (session.answered ? 1 : 0)} / ${session.questions.length}</div></div>
+      <div class="topic-row"><div><strong>Aciertos</strong></div><div class="percent" style="color:var(--good)">${session.correct}</div></div>
+      <div class="topic-row"><div><strong>Fallos</strong></div><div class="percent" style="color:#b42318">${session.wrong}</div></div>
+      <div class="progress-track"><span style="width:${(session.index + (session.answered ? 1 : 0)) / session.questions.length * 100}%"></span></div>
+      <div class="notice"><strong>Refuerzo pendiente:</strong> ${ccapEnsureProgress().pendingQuestionIds.length} preguntas.</div>
+      <p class="muted" style="font-size:12px">Atajos de teclado: A, B, C o D para elegir una respuesta.</p>
+    </aside>
+  </div>`;
+
+  area.querySelectorAll("[data-answer]").forEach(button => button.addEventListener("click", () => {
+    ccapAnswerPractice(Number(button.dataset.answer));
+  }));
+  const next = document.getElementById("ccapNext");
+  if (next) next.addEventListener("click", () => {
+    session.index++;
+    session.answered = false;
+    session.selected = null;
+    ccapRenderPracticeQuestion();
+  });
+}
+
+function ccapAnswerPractice(index) {
+  if (!ccapPractice || ccapPractice.answered || ccapPractice.done) return;
+  const q = ccapPractice.questions[ccapPractice.index];
+  const isCorrect = index === q.correct;
+  ccapPractice.selected = index;
+  ccapPractice.answered = true;
+  if (isCorrect) ccapPractice.correct++;
+  else ccapPractice.wrong++;
+  ccapRecordResponse(q, isCorrect, true);
+  ccapRenderPracticeQuestion();
+}
+
+function ccapRenderPreparatoria() {
+  const view = document.getElementById("view-preparatoria");
+  if (ccapExam) {
+    if (ccapExam.finished) ccapRenderExamResult();
+    else ccapRenderExamQuestion();
+    return;
+  }
+  view.innerHTML = `
+    <div class="section-heading"><div><h2>Preparatoria · Simulacros</h2><p>Sin pistas ni corrección inmediata: revisa nota y explicaciones al entregar.</p></div><span class="tag">Modo examen</span></div>
+    <div class="grid-2">
+      <article class="card feature-card"><div class="feature-icon">🚛</div><h3>Simulacro permiso C</h3><p>20 preguntas · 20 minutos. 20 preguntas · 20 minutos. Objetivo de práctica: máximo 2 respuestas incorrectas o en blanco; verifica siempre las condiciones de tu convocatoria.</p><button class="button primary" id="ccapStartC">Iniciar simulacro C →</button></article>
+      <article class="card feature-card"><div class="feature-icon">📋</div><h3>Simulacro CAP mercancías</h3><p>100 preguntas · 120 minutos. 75 preguntas generales y 25 específicas de mercancías; puntuación de práctica: +1 acierto, −0,5 error y 0 en blanco.</p><button class="button primary" id="ccapStartCAP">Iniciar simulacro CAP →</button></article>
+    </div>
+    <div class="notice"><strong>Importante:</strong> son simulacros didácticos con preguntas originales, no exámenes oficiales. El formato CAP de referencia (100 preguntas, mínimo 2 horas y penalización de −0,5 por error) está recogido en el Real Decreto 284/2021. Comprueba la convocatoria concreta.</div>
+    <div class="section-heading"><div><h2>Plan preparatorio</h2><p>Un ciclo de estudio sencillo para consolidar conocimientos.</p></div></div>
+    <div class="grid-2">
+      <article class="card feature-card"><h3>1 · Estudiar</h3><p>Lee uno o dos bloques lectivos y apunta cifras, conceptos y excepciones.</p></article>
+      <article class="card feature-card"><h3>2 · Practicar</h3><p>Haz tests por tema y revisa la explicación después de cada respuesta.</p></article>
+      <article class="card feature-card"><h3>3 · Reforzar</h3><p>Prioriza las preguntas falladas hasta responderlas correctamente.</p></article>
+      <article class="card feature-card"><h3>4 · Simular</h3><p>Haz el examen sin apuntes y analiza los errores al finalizar.</p></article>
+    </div>
+  `;
+  document.getElementById("ccapStartC").addEventListener("click", () => ccapStartExam("C"));
+  document.getElementById("ccapStartCAP").addEventListener("click", () => ccapStartExam("CAP"));
+}
+
+function ccapStartExam(mode) {
+  let questions;
+  if (mode === "CAP") {
+    const general = ccapShuffle(CCAP_BANK.filter(q => q.area === "CAP" && !q.specific)).slice(0, 75);
+    const specific = ccapShuffle(CCAP_BANK.filter(q => q.area === "CAP" && q.specific)).slice(0, 25);
+    if (general.length < 75 || specific.length < 25) {
+      alert("El banco todavía no contiene suficientes preguntas para un simulacro CAP completo.");
+      return;
+    }
+    questions = ccapShuffle([...general, ...specific]);
+  } else {
+    questions = ccapShuffle(CCAP_BANK.filter(q => q.area === "C")).slice(0, 20);
+    if (questions.length < 20) {
+      alert("No hay suficientes preguntas de permiso C en el banco.");
+      return;
+    }
+  }
+
+  ccapExam = {
+    mode, questions, answers: {}, index: 0,
+    secondsLeft: mode === "CAP" ? 120 * 60 : 20 * 60,
+    finished: false, result: null
+  };
+  showTab("preparatoria");
+  ccapRenderExamQuestion();
+  if (ccapTimer) clearInterval(ccapTimer);
+  ccapTimer = setInterval(() => {
+    if (!ccapExam || ccapExam.finished) {
+      clearInterval(ccapTimer);
+      ccapTimer = null;
+      return;
+    }
+    ccapExam.secondsLeft--;
+    const timer = document.getElementById("ccapTimer");
+    if (timer) {
+      timer.textContent = ccapFormatTime(ccapExam.secondsLeft);
+      timer.classList.toggle("urgent", ccapExam.secondsLeft <= 300);
+    }
+    if (ccapExam.secondsLeft <= 0) ccapFinishExam(true);
+  }, 1000);
+}
+
+function ccapFormatTime(seconds) {
+  const s = Math.max(0, seconds);
+  return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+}
+
+function ccapRenderExamQuestion() {
+  const view = document.getElementById("view-preparatoria");
+  if (!ccapExam) return ccapRenderPreparatoria();
+  if (ccapExam.finished) return ccapRenderExamResult();
+
+  const exam = ccapExam;
+  const q = exam.questions[exam.index];
+  const answered = Object.keys(exam.answers).length;
+  view.innerHTML = `
+    <div class="section-heading">
+      <div><h2>Simulacro ${exam.mode === "CAP" ? "CAP mercancías" : "permiso C"}</h2><p>La corrección está oculta hasta entregar el examen.</p></div>
+      <div class="card" style="padding:10px 15px;text-align:center"><span class="muted" style="font-size:11px">Tiempo restante</span><div id="ccapTimer" style="font-size:25px;font-weight:900;font-variant-numeric:tabular-nums">${ccapFormatTime(exam.secondsLeft)}</div></div>
+    </div>
+    <div class="grid-2" style="align-items:start">
+      <article class="card">
+        <div class="row-actions"><span class="tag">${exam.mode === "CAP" ? "CAP mercancías" : "Permiso C"}</span><span class="tag">${ccapEscape(q.topic)}</span><span class="tag" style="margin-left:auto">${exam.index + 1} / ${exam.questions.length}</span></div>
+        <h3 style="font-size:clamp(18px,2.5vw,23px);line-height:1.35;margin:17px 0">${ccapEscape(q.text)}</h3>
+        <div style="display:grid;gap:9px">
+          ${q.options.map((option, index) => `<button type="button" class="ccap-choice button ${exam.answers[q.id] === index ? "selected" : ""}" data-exam-answer="${index}">
+            <span class="ccap-letter">${CCAP_LETTERS[index]}</span><span>${ccapEscape(option)}</span>
+          </button>`).join("")}
+        </div>
+        <div class="row-actions" style="justify-content:space-between;margin-top:15px">
+          <button class="button" id="ccapExamPrev" ${exam.index === 0 ? "disabled" : ""}>← Anterior</button>
+          <button class="button" id="ccapExamNext" ${exam.index === exam.questions.length - 1 ? "disabled" : ""}>Siguiente →</button>
+        </div>
+        <div class="row-actions" style="justify-content:space-between;margin-top:9px">
+          <button class="button" id="ccapExamClear">Borrar respuesta</button>
+          <button class="button primary" id="ccapExamSubmit">Entregar examen</button>
+        </div>
+      </article>
+      <aside class="card">
+        <h3 style="font-size:15px">Hoja de respuestas</h3>
+        <div class="topic-row"><div><strong>Contestadas</strong></div><div class="percent">${answered}/${exam.questions.length}</div></div>
+        <div class="topic-row"><div><strong>En blanco</strong></div><div class="percent">${exam.questions.length - answered}</div></div>
+        <div class="progress-track"><span style="width:${answered / exam.questions.length * 100}%"></span></div>
+        <div class="ccap-jump-grid">${exam.questions.map((question, index) => `<button type="button" class="ccap-jump ${exam.answers[question.id] !== undefined ? "answered" : ""} ${index === exam.index ? "current" : ""}" data-jump="${index}">${index + 1}</button>`).join("")}</div>
+        <div class="notice">Puedes cambiar respuestas antes de entregar. El temporizador sigue activo aunque cambies de sección.</div>
+      </aside>
+    </div>
+  `;
+
+  view.querySelectorAll("[data-exam-answer]").forEach(button => button.addEventListener("click", () => {
+    exam.answers[q.id] = Number(button.dataset.examAnswer);
+    ccapRenderExamQuestion();
+  }));
+  document.getElementById("ccapExamPrev").addEventListener("click", () => { exam.index--; ccapRenderExamQuestion(); });
+  document.getElementById("ccapExamNext").addEventListener("click", () => { exam.index++; ccapRenderExamQuestion(); });
+  document.getElementById("ccapExamClear").addEventListener("click", () => { delete exam.answers[q.id]; ccapRenderExamQuestion(); });
+  document.getElementById("ccapExamSubmit").addEventListener("click", () => {
+    const blank = exam.questions.length - Object.keys(exam.answers).length;
+    if (confirm(`¿Entregar el examen? Quedan ${blank} preguntas en blanco.`)) ccapFinishExam(false);
+  });
+  view.querySelectorAll("[data-jump]").forEach(button => button.addEventListener("click", () => {
+    exam.index = Number(button.dataset.jump);
+    ccapRenderExamQuestion();
+  }));
+}
+
+function ccapFinishExam(byTime = false) {
+  if (!ccapExam || ccapExam.finished) return;
+  if (ccapTimer) clearInterval(ccapTimer);
+  ccapTimer = null;
+  const exam = ccapExam;
+  exam.finished = true;
+
+  let correct = 0, wrong = 0, blank = 0;
+  for (const q of exam.questions) {
+    const answer = exam.answers[q.id];
+    if (answer === undefined) {
+      blank++;
+      continue;
+    }
+    const isCorrect = answer === q.correct;
+    if (isCorrect) correct++;
+    else wrong++;
+    ccapRecordResponse(q, isCorrect, false);
+  }
+
+  const points = exam.mode === "CAP" ? correct - wrong * 0.5 : correct;
+  const passed = exam.mode === "CAP" ? points >= 50 : (wrong + blank) <= 2;
+  exam.result = { date: new Date().toISOString(), mode: exam.mode, correct, wrong, blank, total: exam.questions.length, points, passed, byTime };
+  const p = ccapEnsureProgress();
+  p.completedExams = (Number(p.completedExams) || 0) + 1;
+  p.examHistory.unshift(exam.result);
+  p.examHistory = p.examHistory.slice(0, 30);
+  saveState();
+  updateDashboard();
+  ccapRenderExamResult();
+}
+
+function ccapRenderExamResult() {
+  const view = document.getElementById("view-preparatoria");
+  if (!ccapExam || !ccapExam.result) return ccapRenderPreparatoria();
+  const exam = ccapExam;
+  const result = exam.result;
+  const title = result.passed ? "Objetivo de práctica alcanzado" : "Conviene repasar y volver a intentarlo";
+  view.innerHTML = `
+    <div class="card">
+      <div class="eyebrow">Resultado del simulacro</div><h2>${title}</h2>
+      <div class="grid-2" style="align-items:center">
+        <div><div style="font-size:42px;font-weight:900;letter-spacing:-2px">${exam.mode === "CAP" ? result.points.toFixed(1) + " / 100" : result.wrong + " fallos"}</div>
+          <span class="tag">${result.passed ? "OBJETIVO ALCANZADO" : "OBJETIVO NO ALCANZADO"}</span>
+          <p class="muted" style="font-size:12px;margin-top:10px">${exam.mode === "CAP" ? "Cálculo didáctico: aciertos − 0,5 × errores; referencia de aprobado: 50 puntos." : "Objetivo de práctica: máximo 2 respuestas incorrectas o en blanco. Confirma el formato de tu convocatoria."}</p>
+        </div>
+        <div>
+          <div class="topic-row"><div><strong>Correctas</strong></div><div class="percent" style="color:var(--good)">${result.correct}</div></div>
+          <div class="topic-row"><div><strong>Incorrectas</strong></div><div class="percent" style="color:#b42318">${result.wrong}</div></div>
+          <div class="topic-row"><div><strong>En blanco</strong></div><div class="percent">${result.blank}</div></div>
+          <div class="topic-row"><div><strong>Tiempo restante</strong></div><div class="percent">${ccapFormatTime(exam.secondsLeft)}</div></div>
+        </div>
+      </div>
+      <div class="notice">Las respuestas erróneas se han añadido al refuerzo adaptativo. Este simulacro es material de práctica, no una reproducción íntegra del examen oficial.</div>
+      <div class="row-actions"><button class="button primary" id="ccapNewExam">Nuevo simulacro</button><button class="button" id="ccapReviewMistakes">Reforzar errores</button><button class="button" id="ccapGoProgress">Ver progreso</button></div>
+    </div>
+    <div class="section-heading"><div><h2>Revisión de respuestas</h2><p>La explicación aparece ahora que el simulacro ha terminado.</p></div></div>
+    ${exam.questions.map((q, index) => {
+      const answer = exam.answers[q.id];
+      const correct = answer === q.correct;
+      const blank = answer === undefined;
+      return `<article class="card" style="margin-bottom:10px;border-left:4px solid ${blank ? "var(--line)" : correct ? "var(--good)" : "#b42318"}">
+        <strong style="font-size:13px">${index + 1}. ${ccapEscape(q.text)}</strong>
+        <p class="muted" style="font-size:12px;margin:8px 0 4px"><strong>Tu respuesta:</strong> ${blank ? "En blanco" : CCAP_LETTERS[answer] + ". " + ccapEscape(q.options[answer])}</p>
+        <p class="muted" style="font-size:12px;margin:4px 0"><strong>Correcta:</strong> ${CCAP_LETTERS[q.correct]}. ${ccapEscape(q.options[q.correct])}</p>
+        <p style="font-size:13px;margin:8px 0 0">${ccapEscape(q.explanation)}</p>
+        ${!blank && !correct ? `<p style="font-size:12px;margin:6px 0 0"><strong>Por qué falla:</strong> ${ccapEscape(q.wrong)}</p>` : ""}
+      </article>`;
+    }).join("")}
+  `;
+  document.getElementById("ccapNewExam").addEventListener("click", () => { ccapExam = null; ccapRenderPreparatoria(); });
+  document.getElementById("ccapReviewMistakes").addEventListener("click", () => {
+    ccapExam = null;
+    ccapPracticeArea = "all";
+    ccapPracticeTopic = "all";
+    showTab("interactiva");
+    ccapRenderInteractive();
+    ccapStartPractice(true);
+  });
+  document.getElementById("ccapGoProgress").addEventListener("click", () => showTab("progreso"));
+}
+
+function ccapOverrideProgressRenderers() {
+  renderTopicProgress = function() {
+    const container = document.getElementById("topicProgress");
+    if (!container) return;
+    container.innerHTML = CCAP_TOPIC_ORDER.map(topic => {
+      const s = ccapGetTopicStats(topic);
+      const accuracy = s.answered ? Math.round(s.correct / s.answered * 100) : 0;
+      return `<div class="topic-row">
+        <div><strong>${ccapEscape(topic)}</strong><small>${s.answered} respuestas · ${s.wrong} fallos</small></div>
+        <div class="progress-track"><span style="width:${accuracy}%"></span></div><div class="percent">${accuracy}%</div>
+      </div>`;
+    }).join("");
+  };
+
+  renderExamHistory = function() {
+    const container = document.getElementById("examHistory");
+    if (!container) return;
+    const history = ccapEnsureProgress().examHistory;
+    if (!history.length) {
+      container.innerHTML = '<p class="muted" style="margin:0;font-size:13px">Todavía no hay simulacros guardados.</p>';
+      return;
+    }
+    container.innerHTML = `<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;min-width:520px">
+      <thead><tr><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Fecha</th><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Modo</th><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Aciertos</th><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Fallos</th><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Nota</th><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">Resultado</th></tr></thead>
+      <tbody>${history.slice(0, 30).map(item => `<tr>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${ccapEscape(new Date(item.date).toLocaleString("es-ES",{dateStyle:"short",timeStyle:"short"}))}</td>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${item.mode === "CAP" ? "CAP" : "Permiso C"}</td>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${item.correct}</td>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${item.wrong}</td>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${item.mode === "CAP" ? Number(item.points).toFixed(1) : item.wrong + " fallos"}</td>
+        <td style="padding:9px;border-bottom:1px solid var(--line);font-size:12px">${item.passed ? "Objetivo" : "Repasar"}</td>
+      </tr>`).join("")}</tbody>
+    </table></div>`;
+  };
+}
+
+function ccapInjectStyles() {
+  if (document.getElementById("ccapPart2Styles")) return;
+  const style = document.createElement("style");
+  style.id = "ccapPart2Styles";
+  style.textContent = `
+    .ccap-choice { display:flex; align-items:flex-start; gap:10px; text-align:left; width:100%; padding:12px; border-radius:12px; background:var(--surface-soft); white-space:normal; line-height:1.4; }
+    .ccap-choice .ccap-letter { display:grid; place-items:center; flex:0 0 27px; height:27px; border:1px solid var(--line); border-radius:8px; font-size:12px; font-weight:900; background:var(--surface); }
+    .ccap-choice.ccap-correct { background:#dcfce7; color:#14532d; border-color:#16a34a; }
+    .ccap-choice.ccap-wrong { background:#fee2e2; color:#7f1d1d; border-color:#dc2626; }
+    :root[data-theme="dark"] .ccap-choice.ccap-correct { background:#123824; color:#bbf7d0; border-color:#4ade80; }
+    :root[data-theme="dark"] .ccap-choice.ccap-wrong { background:#451b25; color:#fecaca; border-color:#f87171; }
+    .ccap-choice.selected { background:var(--brand-soft); border-color:var(--brand); }
+    .ccap-jump-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:13px; }
+    .ccap-jump { border:1px solid var(--line); border-radius:8px; padding:8px 0; background:var(--surface-soft); color:var(--text); font-weight:800; font-size:11px; }
+    .ccap-jump.answered { background:var(--brand-soft); color:var(--brand); border-color:var(--brand); }
+    .ccap-jump.current { outline:2px solid var(--brand); }
+    #ccapTimer.urgent { color:#dc2626; }
+    @media(max-width:600px) { .ccap-jump-grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+  `;
+  document.head.appendChild(style);
+}
+
+function ccapInitialize() {
+  ccapEnsureProgress();
+  ccapInjectStyles();
+  ccapOverrideProgressRenderers();
+  ccapRenderLectiva();
+  ccapRenderInteractive();
+  ccapRenderPreparatoria();
+  updateDashboard();
+
+  // The first script handles tab navigation; this refreshes active module content after navigation.
+  document.querySelectorAll(".nav-button").forEach(button => {
+    button.addEventListener("click", () => {
+      window.setTimeout(() => {
+        if (button.dataset.tab === "interactiva") ccapRenderInteractive();
+        if (button.dataset.tab === "preparatoria") ccapRenderPreparatoria();
+        updateDashboard();
+      }, 0);
+    });
+  });
+
+  document.addEventListener("keydown", event => {
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
+    const interactiveVisible = !document.getElementById("view-interactiva").classList.contains("hidden");
+    const preparatoryVisible = !document.getElementById("view-preparatoria").classList.contains("hidden");
+    if (interactiveVisible && ccapPractice && !ccapPractice.answered && !ccapPractice.done && /^[a-d]$/i.test(event.key)) {
+      ccapAnswerPractice(event.key.toLowerCase().charCodeAt(0) - 97);
+    } else if (preparatoryVisible && ccapExam && !ccapExam.finished) {
+      if (/^[a-d]$/i.test(event.key)) {
+        const q = ccapExam.questions[ccapExam.index];
+        ccapExam.answers[q.id] = event.key.toLowerCase().charCodeAt(0) - 97;
+        ccapRenderExamQuestion();
+      } else if (event.key === "ArrowRight" && ccapExam.index < ccapExam.questions.length - 1) {
+        ccapExam.index++;
+        ccapRenderExamQuestion();
+      } else if (event.key === "ArrowLeft" && ccapExam.index > 0) {
+        ccapExam.index--;
+        ccapRenderExamQuestion();
+      }
+    }
+  });
+}
+
+ccapInitialize();
+
+</script>
+</body>
+</html>
